@@ -2,6 +2,7 @@ package storage
 
 import (
 	dm "storage.g128.rvlz.io/domain"
+	er "storage.g128.rvlz.io/domain/storage/errors"
 	ev "storage.g128.rvlz.io/domain/storage/events"
 )
 
@@ -48,6 +49,15 @@ func (ws *WarehouseStorage) ReservedStorage() int {
 }
 
 func (ws *WarehouseStorage) Reserve(file File) error {
+	availableStorage := ws.AvailableStorage()
+	if file.Size > availableStorage {
+		ws.events = append(ws.events, ev.AvailableStorageExceeded{
+			WarehouseID:      ws.warehouseID,
+			FileID:           file.ID,
+			AvailableStorage: availableStorage,
+		})
+		return er.AvailableStorageExceeded
+	}
 	ws.queue.Add(file)
 	ws.events = append(ws.events, ev.StorageReserved{
 		WarehouseID: ws.warehouseID,
@@ -58,6 +68,10 @@ func (ws *WarehouseStorage) Reserve(file File) error {
 
 func (ws *WarehouseStorage) Events() []dm.Event {
 	return ws.events
+}
+
+func (ws *WarehouseStorage) clearEvents() {
+	ws.events = nil
 }
 
 type StorageFactory struct{}

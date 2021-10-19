@@ -9,4 +9,11 @@ type StorageReserved struct {
 	FileID      dm.FileID
 }
 
-func (StorageReserved) IsEvent() {}
+type AvailableStorageExceeded struct {
+	WarehouseID      dm.WarehouseID
+	FileID           dm.FileID
+	AvailableStorage int
+}
+
+func (StorageReserved) IsEvent()          {}
+func (AvailableStorageExceeded) IsEvent() {}
