@@ -30,6 +30,17 @@ func GetAvailableStorageExceededEvents(events []dm.Event) []ev.AvailableStorageE
 	return targetEvents
 }
 
+func GetStorageReservationDuplicatedEvents(events []dm.Event) []ev.StorageReservationDuplicated {
+	targetEvents := []ev.StorageReservationDuplicated{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.StorageReservationDuplicated)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}
+
 func TestStorageReservation(t *testing.T) {
 	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
 	factory := StorageFactory{}
@@ -85,6 +96,35 @@ func TestExceedingStorageLimit(t *testing.T) {
 			WarehouseID:      warehouseID,
 			FileID:           otherFile.ID,
 			AvailableStorage: 90,
+		},
+	)
+}
+
+func TestDuplicateStorageReservations(t *testing.T) {
+	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
+	factory := StorageFactory{}
+	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	file := File{
+		ID:   dm.IDFactory{}.NewFileID(),
+		Size: 10,
+	}
+	sameFile := file
+	warehouseStorage.Reserve(file)
+	warehouseStorage.clearEvents()
+
+	err := warehouseStorage.Reserve(sameFile)
+
+	events := GetStorageReservationDuplicatedEvents(warehouseStorage.Events())
+	assert.Equal(t, er.StorageReservationDuplicated, err)
+	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
+	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.StorageReservationDuplicated{
+			WarehouseID: warehouseID,
+			FileID:      file.ID,
 		},
 	)
 }

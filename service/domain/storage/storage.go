@@ -14,6 +14,15 @@ type Queue struct {
 	reservations []Reservation
 }
 
+func (queue *Queue) IsWaiting(file File) bool {
+	for _, reservation := range queue.reservations {
+		if reservation.File.ID == file.ID {
+			return true
+		}
+	}
+	return false
+}
+
 func (queue *Queue) Add(file File) {
 	reservation := Reservation{File: file}
 	queue.reservations = append(queue.reservations, reservation)
@@ -49,6 +58,13 @@ func (ws *WarehouseStorage) ReservedStorage() int {
 }
 
 func (ws *WarehouseStorage) Reserve(file File) error {
+	if ws.queue.IsWaiting(file) {
+		ws.events = append(ws.events, ev.StorageReservationDuplicated{
+			WarehouseID: ws.warehouseID,
+			FileID:      file.ID,
+		})
+		return er.StorageReservationDuplicated
+	}
 	availableStorage := ws.AvailableStorage()
 	if file.Size > availableStorage {
 		ws.events = append(ws.events, ev.AvailableStorageExceeded{

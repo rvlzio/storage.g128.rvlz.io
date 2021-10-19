@@ -15,5 +15,11 @@ type AvailableStorageExceeded struct {
 	AvailableStorage int
 }
 
-func (StorageReserved) IsEvent()          {}
-func (AvailableStorageExceeded) IsEvent() {}
+type StorageReservationDuplicated struct {
+	WarehouseID dm.WarehouseID
+	FileID      dm.FileID
+}
+
+func (StorageReserved) IsEvent()              {}
+func (AvailableStorageExceeded) IsEvent()     {}
+func (StorageReservationDuplicated) IsEvent() {}
