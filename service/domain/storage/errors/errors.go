@@ -11,4 +11,7 @@ var (
 	StorageReservationDuplicated = errors.New(
 		"storage_reservation_duplicated",
 	)
+	UnreservedStorageCommitted = errors.New(
+		"unreserved_storage_committed",
+	)
 )

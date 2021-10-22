@@ -52,6 +52,17 @@ func GetReservedStorageCommittedEvents(events []dm.Event) []ev.ReservedStorageCo
 	return targetEvents
 }
 
+func GetUnreservedStorageCommittedEvents(events []dm.Event) []ev.UnreservedStorageCommitted {
+	targetEvents := []ev.UnreservedStorageCommitted{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.UnreservedStorageCommitted)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}
+
 func TestStorageReservation(t *testing.T) {
 	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
 	factory := StorageFactory{}
@@ -164,6 +175,29 @@ func TestCommittingReservation(t *testing.T) {
 		ev.ReservedStorageCommitted{
 			WarehouseID: warehouseID,
 			FileID:      file.ID,
+		},
+	)
+}
+
+func TestCommittingUnreservedStorage(t *testing.T) {
+	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
+	factory := StorageFactory{}
+	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	fileID := dm.IDFactory{}.NewFileID()
+
+	err := warehouseStorage.Commit(fileID)
+
+	events := GetUnreservedStorageCommittedEvents(warehouseStorage.Events())
+	assert.Equal(t, er.UnreservedStorageCommitted, err)
+	assert.Equal(t, 100, warehouseStorage.AvailableStorage())
+	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.UnreservedStorageCommitted{
+			WarehouseID: warehouseID,
+			FileID:      fileID,
 		},
 	)
 }
