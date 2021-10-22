@@ -5,63 +5,9 @@ import (
 	dm "storage.g128.rvlz.io/domain"
 	er "storage.g128.rvlz.io/domain/storage/errors"
 	ev "storage.g128.rvlz.io/domain/storage/events"
+	ut "storage.g128.rvlz.io/domain/storage/util"
 	"testing"
 )
-
-func GetStorageReservedEvents(events []dm.Event) []ev.StorageReserved {
-	targetEvents := []ev.StorageReserved{}
-	for _, event := range events {
-		targetEvent, ok := event.(ev.StorageReserved)
-		if ok {
-			targetEvents = append(targetEvents, targetEvent)
-		}
-	}
-	return targetEvents
-}
-
-func GetAvailableStorageExceededEvents(events []dm.Event) []ev.AvailableStorageExceeded {
-	targetEvents := []ev.AvailableStorageExceeded{}
-	for _, event := range events {
-		targetEvent, ok := event.(ev.AvailableStorageExceeded)
-		if ok {
-			targetEvents = append(targetEvents, targetEvent)
-		}
-	}
-	return targetEvents
-}
-
-func GetStorageReservationDuplicatedEvents(events []dm.Event) []ev.StorageReservationDuplicated {
-	targetEvents := []ev.StorageReservationDuplicated{}
-	for _, event := range events {
-		targetEvent, ok := event.(ev.StorageReservationDuplicated)
-		if ok {
-			targetEvents = append(targetEvents, targetEvent)
-		}
-	}
-	return targetEvents
-}
-
-func GetReservedStorageCommittedEvents(events []dm.Event) []ev.ReservedStorageCommitted {
-	targetEvents := []ev.ReservedStorageCommitted{}
-	for _, event := range events {
-		targetEvent, ok := event.(ev.ReservedStorageCommitted)
-		if ok {
-			targetEvents = append(targetEvents, targetEvent)
-		}
-	}
-	return targetEvents
-}
-
-func GetUnreservedStorageCommittedEvents(events []dm.Event) []ev.UnreservedStorageCommitted {
-	targetEvents := []ev.UnreservedStorageCommitted{}
-	for _, event := range events {
-		targetEvent, ok := event.(ev.UnreservedStorageCommitted)
-		if ok {
-			targetEvents = append(targetEvents, targetEvent)
-		}
-	}
-	return targetEvents
-}
 
 func TestStorageReservation(t *testing.T) {
 	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
@@ -74,7 +20,7 @@ func TestStorageReservation(t *testing.T) {
 
 	err := warehouseStorage.Reserve(file)
 
-	events := GetStorageReservedEvents(warehouseStorage.Events())
+	events := ut.GetStorageReservedEvents(warehouseStorage.Events())
 	assert.Nil(t, err)
 	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
 	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
@@ -106,7 +52,7 @@ func TestExceedingStorageLimit(t *testing.T) {
 
 	err := warehouseStorage.Reserve(otherFile)
 
-	events := GetAvailableStorageExceededEvents(warehouseStorage.Events())
+	events := ut.GetAvailableStorageExceededEvents(warehouseStorage.Events())
 	assert.Equal(t, er.AvailableStorageExceeded, err)
 	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
 	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
@@ -136,7 +82,7 @@ func TestDuplicateStorageReservations(t *testing.T) {
 
 	err := warehouseStorage.Reserve(sameFile)
 
-	events := GetStorageReservationDuplicatedEvents(warehouseStorage.Events())
+	events := ut.GetStorageReservationDuplicatedEvents(warehouseStorage.Events())
 	assert.Equal(t, er.StorageReservationDuplicated, err)
 	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
 	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
@@ -164,7 +110,7 @@ func TestCommittingReservation(t *testing.T) {
 
 	err := warehouseStorage.Commit(file.ID)
 
-	events := GetReservedStorageCommittedEvents(warehouseStorage.Events())
+	events := ut.GetReservedStorageCommittedEvents(warehouseStorage.Events())
 	assert.Nil(t, err)
 	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
 	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
@@ -187,7 +133,7 @@ func TestCommittingUnreservedStorage(t *testing.T) {
 
 	err := warehouseStorage.Commit(fileID)
 
-	events := GetUnreservedStorageCommittedEvents(warehouseStorage.Events())
+	events := ut.GetUnreservedStorageCommittedEvents(warehouseStorage.Events())
 	assert.Equal(t, er.UnreservedStorageCommitted, err)
 	assert.Equal(t, 100, warehouseStorage.AvailableStorage())
 	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
