@@ -30,8 +30,15 @@ type UnreservedStorageCommitted struct {
 	FileID      dm.FileID
 }
 
+type StorageUnreserved struct {
+	WarehouseID       dm.WarehouseID
+	FileID            dm.FileID
+	UnreservedStorage int
+}
+
 func (StorageReserved) IsEvent()              {}
 func (AvailableStorageExceeded) IsEvent()     {}
 func (StorageReservationDuplicated) IsEvent() {}
 func (ReservedStorageCommitted) IsEvent()     {}
 func (UnreservedStorageCommitted) IsEvent()   {}
+func (StorageUnreserved) IsEvent()            {}

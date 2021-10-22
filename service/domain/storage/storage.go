@@ -101,6 +101,16 @@ func (ws *WarehouseStorage) Reserve(file File) error {
 	return nil
 }
 
+func (ws *WarehouseStorage) Unreserve(fileID dm.FileID) error {
+	file, _ := ws.queue.Remove(fileID)
+	ws.events = append(ws.events, ev.StorageUnreserved{
+		WarehouseID:       ws.warehouseID,
+		FileID:            file.ID,
+		UnreservedStorage: file.Size,
+	})
+	return nil
+}
+
 func (ws *WarehouseStorage) Commit(fileID dm.FileID) error {
 	if !ws.queue.IsWaiting(File{fileID, 0}) {
 		ws.events = append(ws.events, ev.UnreservedStorageCommitted{

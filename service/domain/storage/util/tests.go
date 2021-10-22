@@ -59,3 +59,14 @@ func GetUnreservedStorageCommittedEvents(events []dm.Event) []ev.UnreservedStora
 	}
 	return targetEvents
 }
+
+func GetStorageUnreservedEvents(events []dm.Event) []ev.StorageUnreserved {
+	targetEvents := []ev.StorageUnreserved{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.StorageUnreserved)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}
