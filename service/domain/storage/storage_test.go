@@ -41,6 +41,17 @@ func GetStorageReservationDuplicatedEvents(events []dm.Event) []ev.StorageReserv
 	return targetEvents
 }
 
+func GetReservedStorageCommittedEvents(events []dm.Event) []ev.ReservedStorageCommitted {
+	targetEvents := []ev.ReservedStorageCommitted{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.ReservedStorageCommitted)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}
+
 func TestStorageReservation(t *testing.T) {
 	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
 	factory := StorageFactory{}
@@ -123,6 +134,34 @@ func TestDuplicateStorageReservations(t *testing.T) {
 		t,
 		events,
 		ev.StorageReservationDuplicated{
+			WarehouseID: warehouseID,
+			FileID:      file.ID,
+		},
+	)
+}
+
+func TestCommittingReservation(t *testing.T) {
+	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
+	factory := StorageFactory{}
+	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	file := File{
+		ID:   dm.IDFactory{}.NewFileID(),
+		Size: 10,
+	}
+	warehouseStorage.Reserve(file)
+	warehouseStorage.clearEvents()
+
+	err := warehouseStorage.Commit(file.ID)
+
+	events := GetReservedStorageCommittedEvents(warehouseStorage.Events())
+	assert.Nil(t, err)
+	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
+	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.ReservedStorageCommitted{
 			WarehouseID: warehouseID,
 			FileID:      file.ID,
 		},

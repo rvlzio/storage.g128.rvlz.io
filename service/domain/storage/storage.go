@@ -28,6 +28,25 @@ func (queue *Queue) Add(file File) {
 	queue.reservations = append(queue.reservations, reservation)
 }
 
+func (queue *Queue) Remove(fileID dm.FileID) (File, error) {
+	for ix, reservation := range queue.reservations {
+		if reservation.File.ID == fileID {
+			if ix == 0 {
+				queue.reservations = queue.reservations[1:]
+			} else if n := len(queue.reservations); ix == n-1 {
+				queue.reservations = queue.reservations[:ix-1]
+			} else {
+				queue.reservations = append(
+					queue.reservations[:ix-1],
+					queue.reservations[ix+1:]...,
+				)
+			}
+			return reservation.File, nil
+		}
+	}
+	return File{}, nil
+}
+
 func (queue *Queue) Size() int {
 	size := 0
 	for _, reservation := range queue.reservations {
@@ -78,6 +97,16 @@ func (ws *WarehouseStorage) Reserve(file File) error {
 	ws.events = append(ws.events, ev.StorageReserved{
 		WarehouseID: ws.warehouseID,
 		FileID:      file.ID,
+	})
+	return nil
+}
+
+func (ws *WarehouseStorage) Commit(fileID dm.FileID) error {
+	file, _ := ws.queue.Remove(fileID)
+	ws.unclaimedStorage -= file.Size
+	ws.events = append(ws.events, ev.ReservedStorageCommitted{
+		WarehouseID: ws.warehouseID,
+		FileID:      fileID,
 	})
 	return nil
 }
