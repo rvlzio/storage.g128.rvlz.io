@@ -102,6 +102,13 @@ func (ws *WarehouseStorage) Reserve(file File) error {
 }
 
 func (ws *WarehouseStorage) Unreserve(fileID dm.FileID) error {
+	if !ws.queue.IsWaiting(File{fileID, 0}) {
+		ws.events = append(ws.events, ev.NonexistentStorageReservationUnreserved{
+			WarehouseID: ws.warehouseID,
+			FileID:      fileID,
+		})
+		return er.NonexistentStorageReservationUnreserved
+	}
 	file, _ := ws.queue.Remove(fileID)
 	ws.events = append(ws.events, ev.StorageUnreserved{
 		WarehouseID:       ws.warehouseID,

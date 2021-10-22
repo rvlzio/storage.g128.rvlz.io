@@ -14,4 +14,7 @@ var (
 	UnreservedStorageCommitted = errors.New(
 		"unreserved_storage_committed",
 	)
+	NonexistentStorageReservationUnreserved = errors.New(
+		"nonexistent_storage_reservation_unreserved",
+	)
 )

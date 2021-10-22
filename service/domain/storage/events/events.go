@@ -36,9 +36,15 @@ type StorageUnreserved struct {
 	UnreservedStorage int
 }
 
-func (StorageReserved) IsEvent()              {}
-func (AvailableStorageExceeded) IsEvent()     {}
-func (StorageReservationDuplicated) IsEvent() {}
-func (ReservedStorageCommitted) IsEvent()     {}
-func (UnreservedStorageCommitted) IsEvent()   {}
-func (StorageUnreserved) IsEvent()            {}
+type NonexistentStorageReservationUnreserved struct {
+	WarehouseID dm.WarehouseID
+	FileID      dm.FileID
+}
+
+func (StorageReserved) IsEvent()                         {}
+func (AvailableStorageExceeded) IsEvent()                {}
+func (StorageReservationDuplicated) IsEvent()            {}
+func (ReservedStorageCommitted) IsEvent()                {}
+func (UnreservedStorageCommitted) IsEvent()              {}
+func (StorageUnreserved) IsEvent()                       {}
+func (NonexistentStorageReservationUnreserved) IsEvent() {}

@@ -176,3 +176,28 @@ func TestUnreservedStorage(t *testing.T) {
 		},
 	)
 }
+
+func TestUnreservingNonexistentStorageReservation(t *testing.T) {
+	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
+	factory := StorageFactory{}
+	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	fileID := dm.IDFactory{}.NewFileID()
+
+	err := warehouseStorage.Unreserve(fileID)
+
+	events := ut.GetNonexistentStorageReservationUnreservedEvents(
+		warehouseStorage.Events(),
+	)
+	assert.Equal(t, er.NonexistentStorageReservationUnreserved, err)
+	assert.Equal(t, 100, warehouseStorage.AvailableStorage())
+	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.NonexistentStorageReservationUnreserved{
+			WarehouseID: warehouseID,
+			FileID:      fileID,
+		},
+	)
+}
