@@ -94,3 +94,16 @@ func GetStorageFreedEvents(events []dm.Event) []ev.StorageFreed {
 	}
 	return targetEvents
 }
+
+func GetFreedStorageExceededAvailabilityEvents(
+	events []dm.Event,
+) []ev.FreedStorageExceededAvailability {
+	targetEvents := []ev.FreedStorageExceededAvailability{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.FreedStorageExceededAvailability)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}

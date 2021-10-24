@@ -140,6 +140,14 @@ func (ws *WarehouseStorage) Commit(fileID dm.FileID) error {
 }
 
 func (ws *WarehouseStorage) Free(file File) error {
+	if file.Size > ws.AvailableStorage() {
+		ws.events = append(ws.events, ev.FreedStorageExceededAvailability{
+			WarehouseID:      ws.WarehouseID(),
+			FileID:           file.ID,
+			AvailableStorage: ws.AvailableStorage(),
+		})
+		return er.FreedStorageExceededAvailability
+	}
 	ws.unclaimedStorage += file.Size
 	ws.events = append(ws.events, ev.StorageFreed{
 		WarehouseID:  ws.warehouseID,
