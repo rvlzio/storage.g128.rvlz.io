@@ -217,7 +217,7 @@ func TestFreeingStorage(t *testing.T) {
 	)
 }
 
-func TestFreedStorageExceedClaimedStorage(t *testing.T) {
+func TestFreedStorageExceededClaimedStorage(t *testing.T) {
 	capacity := 100
 	warehouseStorage := NewWarehouseStorage(capacity)
 	file, largeFile := NewFile(10), NewFile(15)
