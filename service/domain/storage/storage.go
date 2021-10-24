@@ -140,6 +140,13 @@ func (ws *WarehouseStorage) Commit(fileID dm.FileID) error {
 }
 
 func (ws *WarehouseStorage) Free(file File) error {
+	if ws.queue.IsWaiting(file) {
+		ws.events = append(ws.events, ev.FreeingUncommittedStorageAttempted{
+			WarehouseID: ws.WarehouseID(),
+			FileID:      file.ID,
+		})
+		return er.FreeingUncommittedStorageAttempted
+	}
 	if file.Size > ws.AvailableStorage() {
 		ws.events = append(ws.events, ev.FreedStorageExceededAvailability{
 			WarehouseID:      ws.WarehouseID(),

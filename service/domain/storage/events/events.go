@@ -53,6 +53,11 @@ type FreedStorageExceededAvailability struct {
 	AvailableStorage int
 }
 
+type FreeingUncommittedStorageAttempted struct {
+	WarehouseID dm.WarehouseID
+	FileID      dm.FileID
+}
+
 func (StorageReserved) IsEvent()                         {}
 func (AvailableStorageExceeded) IsEvent()                {}
 func (StorageReservationDuplicated) IsEvent()            {}
@@ -62,3 +67,4 @@ func (StorageUnreserved) IsEvent()                       {}
 func (NonexistentStorageReservationUnreserved) IsEvent() {}
 func (StorageFreed) IsEvent()                            {}
 func (FreedStorageExceededAvailability) IsEvent()        {}
+func (FreeingUncommittedStorageAttempted) IsEvent()      {}

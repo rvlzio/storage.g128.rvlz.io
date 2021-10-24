@@ -107,3 +107,16 @@ func GetFreedStorageExceededAvailabilityEvents(
 	}
 	return targetEvents
 }
+
+func GetFreeingUncommittedStorageAttemptedEvents(
+	events []dm.Event,
+) []ev.FreeingUncommittedStorageAttempted {
+	targetEvents := []ev.FreeingUncommittedStorageAttempted{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.FreeingUncommittedStorageAttempted)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}

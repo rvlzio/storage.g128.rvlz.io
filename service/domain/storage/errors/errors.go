@@ -20,4 +20,7 @@ var (
 	FreedStorageExceededAvailability = errors.New(
 		"freed_storage_exceeded_availability",
 	)
+	FreeingUncommittedStorageAttempted = errors.New(
+		"freeing_uncommitted_storage_attempted",
+	)
 )

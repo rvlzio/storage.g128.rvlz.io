@@ -241,3 +241,29 @@ func TestFreedStorageExceedAvailability(t *testing.T) {
 		},
 	)
 }
+
+func TestFreeingUncommittedStorage(t *testing.T) {
+	capacity := 100
+	warehouseStorage := NewWarehouseStorage(capacity)
+	file := NewFile(10)
+	warehouseStorage.Reserve(file)
+	warehouseStorage.clearEvents()
+
+	err := warehouseStorage.Free(file)
+
+	events := ut.GetFreeingUncommittedStorageAttemptedEvents(
+		warehouseStorage.Events(),
+	)
+	assert.Equal(t, er.FreeingUncommittedStorageAttempted, err)
+	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
+	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.FreeingUncommittedStorageAttempted{
+			WarehouseID: warehouseStorage.WarehouseID(),
+			FileID:      file.ID,
+		},
+	)
+}
