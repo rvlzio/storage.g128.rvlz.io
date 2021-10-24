@@ -63,6 +63,7 @@ type File struct {
 type WarehouseStorage struct {
 	id               dm.WarehouseStorageID
 	warehouseID      dm.WarehouseID
+	capacity         int
 	unclaimedStorage int
 	queue            Queue
 	events           []dm.Event
@@ -72,12 +73,20 @@ func (ws *WarehouseStorage) WarehouseID() dm.WarehouseID {
 	return ws.warehouseID
 }
 
+func (ws *WarehouseStorage) Capacity() int {
+	return ws.capacity
+}
+
 func (ws *WarehouseStorage) AvailableStorage() int {
 	return ws.unclaimedStorage - ws.queue.Size()
 }
 
 func (ws *WarehouseStorage) ReservedStorage() int {
 	return ws.queue.Size()
+}
+
+func (ws *WarehouseStorage) ClaimedStorage() int {
+	return ws.Capacity() - ws.AvailableStorage()
 }
 
 func (ws *WarehouseStorage) Reserve(file File) error {
@@ -147,13 +156,13 @@ func (ws *WarehouseStorage) Free(file File) error {
 		})
 		return er.FreeingUncommittedStorageAttempted
 	}
-	if file.Size > ws.AvailableStorage() {
-		ws.events = append(ws.events, ev.FreedStorageExceededAvailability{
-			WarehouseID:      ws.WarehouseID(),
-			FileID:           file.ID,
-			AvailableStorage: ws.AvailableStorage(),
+	if file.Size > ws.ClaimedStorage() {
+		ws.events = append(ws.events, ev.FreedStorageExceededClaimedStorage{
+			WarehouseID:    ws.WarehouseID(),
+			FileID:         file.ID,
+			ClaimedStorage: ws.ClaimedStorage(),
 		})
-		return er.FreedStorageExceededAvailability
+		return er.FreedStorageExceededClaimedStorage
 	}
 	ws.unclaimedStorage += file.Size
 	ws.events = append(ws.events, ev.StorageFreed{
@@ -183,6 +192,7 @@ func (factory StorageFactory) NewWarehouseStorage(
 	return WarehouseStorage{
 		id:               warehouseStorageID,
 		warehouseID:      warehouseID,
+		capacity:         capacity,
 		unclaimedStorage: capacity,
 		queue:            queue,
 	}

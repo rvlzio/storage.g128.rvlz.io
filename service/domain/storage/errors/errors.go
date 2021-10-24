@@ -17,8 +17,8 @@ var (
 	NonexistentStorageReservationUnreserved = errors.New(
 		"nonexistent_storage_reservation_unreserved",
 	)
-	FreedStorageExceededAvailability = errors.New(
-		"freed_storage_exceeded_availability",
+	FreedStorageExceededClaimedStorage = errors.New(
+		"freed_storage_exceeded_claimed_storage",
 	)
 	FreeingUncommittedStorageAttempted = errors.New(
 		"freeing_uncommitted_storage_attempted",

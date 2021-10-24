@@ -217,27 +217,28 @@ func TestFreeingStorage(t *testing.T) {
 	)
 }
 
-func TestFreedStorageExceedAvailability(t *testing.T) {
+func TestFreedStorageExceedClaimedStorage(t *testing.T) {
 	capacity := 100
 	warehouseStorage := NewWarehouseStorage(capacity)
-	file, largeFile := NewFile(10), NewFile(95)
+	file, largeFile := NewFile(10), NewFile(15)
 	warehouseStorage.Reserve(file)
+	warehouseStorage.Commit(file.ID)
 	warehouseStorage.clearEvents()
 
 	err := warehouseStorage.Free(largeFile)
 
-	events := ut.GetFreedStorageExceededAvailabilityEvents(warehouseStorage.Events())
-	assert.Equal(t, er.FreedStorageExceededAvailability, err)
+	events := ut.GetFreedStorageExceededClaimedStorageEvents(warehouseStorage.Events())
+	assert.Equal(t, er.FreedStorageExceededClaimedStorage, err)
 	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
-		ev.FreedStorageExceededAvailability{
-			WarehouseID:      warehouseStorage.WarehouseID(),
-			FileID:           largeFile.ID,
-			AvailableStorage: 90,
+		ev.FreedStorageExceededClaimedStorage{
+			WarehouseID:    warehouseStorage.WarehouseID(),
+			FileID:         largeFile.ID,
+			ClaimedStorage: 10,
 		},
 	)
 }
