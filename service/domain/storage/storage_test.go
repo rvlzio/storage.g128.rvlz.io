@@ -201,3 +201,31 @@ func TestUnreservingNonexistentStorageReservation(t *testing.T) {
 		},
 	)
 }
+
+func TestFreeingStorage(t *testing.T) {
+	capacity := 100
+	warehouseStorage := NewWarehouseStorage(capacity)
+	file := File{
+		ID:   dm.IDFactory{}.NewFileID(),
+		Size: 10,
+	}
+	warehouseStorage.Reserve(file)
+	warehouseStorage.Commit(file.ID)
+	warehouseStorage.clearEvents()
+
+	err := warehouseStorage.Free(file.Size)
+
+	events := ut.GetStorageFreedEvents(warehouseStorage.Events())
+	assert.Nil(t, err)
+	assert.Equal(t, 100, warehouseStorage.AvailableStorage())
+	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.StorageFreed{
+			WarehouseID:  warehouseStorage.WarehouseID(),
+			FreedStorage: file.Size,
+		},
+	)
+}

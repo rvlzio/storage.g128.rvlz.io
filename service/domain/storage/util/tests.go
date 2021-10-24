@@ -83,3 +83,14 @@ func GetNonexistentStorageReservationUnreservedEvents(
 	}
 	return targetEvents
 }
+
+func GetStorageFreedEvents(events []dm.Event) []ev.StorageFreed {
+	targetEvents := []ev.StorageFreed{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.StorageFreed)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}

@@ -139,6 +139,15 @@ func (ws *WarehouseStorage) Commit(fileID dm.FileID) error {
 	return nil
 }
 
+func (ws *WarehouseStorage) Free(storage int) error {
+	ws.unclaimedStorage += storage
+	ws.events = append(ws.events, ev.StorageFreed{
+		WarehouseID:  ws.warehouseID,
+		FreedStorage: storage,
+	})
+	return nil
+}
+
 func (ws *WarehouseStorage) Events() []dm.Event {
 	return ws.events
 }
