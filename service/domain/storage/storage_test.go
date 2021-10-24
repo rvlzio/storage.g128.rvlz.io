@@ -9,10 +9,16 @@ import (
 	"testing"
 )
 
-func TestStorageReservation(t *testing.T) {
-	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
+func NewWarehouseStorage(capacity int) WarehouseStorage {
+	warehouseID := dm.IDFactory{}.NewWarehouseID()
 	factory := StorageFactory{}
 	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	return warehouseStorage
+}
+
+func TestStorageReservation(t *testing.T) {
+	capacity := 100
+	warehouseStorage := NewWarehouseStorage(capacity)
 	file := File{
 		ID:   dm.IDFactory{}.NewFileID(),
 		Size: 10,
@@ -29,16 +35,15 @@ func TestStorageReservation(t *testing.T) {
 		t,
 		events,
 		ev.StorageReserved{
-			WarehouseID: warehouseID,
+			WarehouseID: warehouseStorage.WarehouseID(),
 			FileID:      file.ID,
 		},
 	)
 }
 
 func TestExceedingStorageLimit(t *testing.T) {
-	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
-	factory := StorageFactory{}
-	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	capacity := 100
+	warehouseStorage := NewWarehouseStorage(capacity)
 	file := File{
 		ID:   dm.IDFactory{}.NewFileID(),
 		Size: 10,
@@ -61,7 +66,7 @@ func TestExceedingStorageLimit(t *testing.T) {
 		t,
 		events,
 		ev.AvailableStorageExceeded{
-			WarehouseID:      warehouseID,
+			WarehouseID:      warehouseStorage.WarehouseID(),
 			FileID:           otherFile.ID,
 			AvailableStorage: 90,
 		},
@@ -69,9 +74,8 @@ func TestExceedingStorageLimit(t *testing.T) {
 }
 
 func TestDuplicateStorageReservations(t *testing.T) {
-	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
-	factory := StorageFactory{}
-	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	capacity := 100
+	warehouseStorage := NewWarehouseStorage(capacity)
 	file := File{
 		ID:   dm.IDFactory{}.NewFileID(),
 		Size: 10,
@@ -91,16 +95,15 @@ func TestDuplicateStorageReservations(t *testing.T) {
 		t,
 		events,
 		ev.StorageReservationDuplicated{
-			WarehouseID: warehouseID,
+			WarehouseID: warehouseStorage.WarehouseID(),
 			FileID:      file.ID,
 		},
 	)
 }
 
 func TestCommittingReservation(t *testing.T) {
-	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
-	factory := StorageFactory{}
-	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	capacity := 100
+	warehouseStorage := NewWarehouseStorage(capacity)
 	file := File{
 		ID:   dm.IDFactory{}.NewFileID(),
 		Size: 10,
@@ -119,16 +122,15 @@ func TestCommittingReservation(t *testing.T) {
 		t,
 		events,
 		ev.ReservedStorageCommitted{
-			WarehouseID: warehouseID,
+			WarehouseID: warehouseStorage.WarehouseID(),
 			FileID:      file.ID,
 		},
 	)
 }
 
 func TestCommittingUnreservedStorage(t *testing.T) {
-	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
-	factory := StorageFactory{}
-	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	capacity := 100
+	warehouseStorage := NewWarehouseStorage(capacity)
 	fileID := dm.IDFactory{}.NewFileID()
 
 	err := warehouseStorage.Commit(fileID)
@@ -142,16 +144,15 @@ func TestCommittingUnreservedStorage(t *testing.T) {
 		t,
 		events,
 		ev.UnreservedStorageCommitted{
-			WarehouseID: warehouseID,
+			WarehouseID: warehouseStorage.WarehouseID(),
 			FileID:      fileID,
 		},
 	)
 }
 
 func TestUnreservedStorage(t *testing.T) {
-	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
-	factory := StorageFactory{}
-	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	capacity := 100
+	warehouseStorage := NewWarehouseStorage(capacity)
 	file := File{
 		ID:   dm.IDFactory{}.NewFileID(),
 		Size: 10,
@@ -170,7 +171,7 @@ func TestUnreservedStorage(t *testing.T) {
 		t,
 		events,
 		ev.StorageUnreserved{
-			WarehouseID:       warehouseID,
+			WarehouseID:       warehouseStorage.WarehouseID(),
 			FileID:            file.ID,
 			UnreservedStorage: file.Size,
 		},
@@ -178,9 +179,8 @@ func TestUnreservedStorage(t *testing.T) {
 }
 
 func TestUnreservingNonexistentStorageReservation(t *testing.T) {
-	warehouseID, capacity := dm.IDFactory{}.NewWarehouseID(), 100
-	factory := StorageFactory{}
-	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	capacity := 100
+	warehouseStorage := NewWarehouseStorage(capacity)
 	fileID := dm.IDFactory{}.NewFileID()
 
 	err := warehouseStorage.Unreserve(fileID)
@@ -196,7 +196,7 @@ func TestUnreservingNonexistentStorageReservation(t *testing.T) {
 		t,
 		events,
 		ev.NonexistentStorageReservationUnreserved{
-			WarehouseID: warehouseID,
+			WarehouseID: warehouseStorage.WarehouseID(),
 			FileID:      fileID,
 		},
 	)
