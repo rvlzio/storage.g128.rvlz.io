@@ -43,6 +43,7 @@ type NonexistentStorageReservationUnreserved struct {
 
 type StorageFreed struct {
 	WarehouseID  dm.WarehouseID
+	FileID       dm.FileID
 	FreedStorage int
 }
 

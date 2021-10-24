@@ -139,11 +139,12 @@ func (ws *WarehouseStorage) Commit(fileID dm.FileID) error {
 	return nil
 }
 
-func (ws *WarehouseStorage) Free(storage int) error {
-	ws.unclaimedStorage += storage
+func (ws *WarehouseStorage) Free(file File) error {
+	ws.unclaimedStorage += file.Size
 	ws.events = append(ws.events, ev.StorageFreed{
 		WarehouseID:  ws.warehouseID,
-		FreedStorage: storage,
+		FileID:       file.ID,
+		FreedStorage: file.Size,
 	})
 	return nil
 }

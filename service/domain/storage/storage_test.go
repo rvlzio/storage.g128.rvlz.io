@@ -199,7 +199,7 @@ func TestFreeingStorage(t *testing.T) {
 	warehouseStorage.Commit(file.ID)
 	warehouseStorage.clearEvents()
 
-	err := warehouseStorage.Free(file.Size)
+	err := warehouseStorage.Free(file)
 
 	events := ut.GetStorageFreedEvents(warehouseStorage.Events())
 	assert.Nil(t, err)
@@ -211,6 +211,7 @@ func TestFreeingStorage(t *testing.T) {
 		events,
 		ev.StorageFreed{
 			WarehouseID:  warehouseStorage.WarehouseID(),
+			FileID:       file.ID,
 			FreedStorage: file.Size,
 		},
 	)
