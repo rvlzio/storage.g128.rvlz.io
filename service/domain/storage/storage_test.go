@@ -16,13 +16,17 @@ func NewWarehouseStorage(capacity int) WarehouseStorage {
 	return warehouseStorage
 }
 
+func NewFile(size int) File {
+	return File{
+		ID:   dm.IDFactory{}.NewFileID(),
+		Size: size,
+	}
+}
+
 func TestStorageReservation(t *testing.T) {
 	capacity := 100
 	warehouseStorage := NewWarehouseStorage(capacity)
-	file := File{
-		ID:   dm.IDFactory{}.NewFileID(),
-		Size: 10,
-	}
+	file := NewFile(10)
 
 	err := warehouseStorage.Reserve(file)
 
@@ -44,14 +48,8 @@ func TestStorageReservation(t *testing.T) {
 func TestExceedingStorageLimit(t *testing.T) {
 	capacity := 100
 	warehouseStorage := NewWarehouseStorage(capacity)
-	file := File{
-		ID:   dm.IDFactory{}.NewFileID(),
-		Size: 10,
-	}
-	otherFile := File{
-		ID:   dm.IDFactory{}.NewFileID(),
-		Size: 100,
-	}
+	file := NewFile(10)
+	otherFile := NewFile(100)
 	warehouseStorage.Reserve(file)
 	warehouseStorage.clearEvents()
 
@@ -76,10 +74,7 @@ func TestExceedingStorageLimit(t *testing.T) {
 func TestDuplicateStorageReservations(t *testing.T) {
 	capacity := 100
 	warehouseStorage := NewWarehouseStorage(capacity)
-	file := File{
-		ID:   dm.IDFactory{}.NewFileID(),
-		Size: 10,
-	}
+	file := NewFile(10)
 	sameFile := file
 	warehouseStorage.Reserve(file)
 	warehouseStorage.clearEvents()
@@ -104,10 +99,7 @@ func TestDuplicateStorageReservations(t *testing.T) {
 func TestCommittingReservation(t *testing.T) {
 	capacity := 100
 	warehouseStorage := NewWarehouseStorage(capacity)
-	file := File{
-		ID:   dm.IDFactory{}.NewFileID(),
-		Size: 10,
-	}
+	file := NewFile(10)
 	warehouseStorage.Reserve(file)
 	warehouseStorage.clearEvents()
 
@@ -153,10 +145,7 @@ func TestCommittingUnreservedStorage(t *testing.T) {
 func TestUnreservedStorage(t *testing.T) {
 	capacity := 100
 	warehouseStorage := NewWarehouseStorage(capacity)
-	file := File{
-		ID:   dm.IDFactory{}.NewFileID(),
-		Size: 10,
-	}
+	file := NewFile(10)
 	warehouseStorage.Reserve(file)
 	warehouseStorage.clearEvents()
 
@@ -205,10 +194,7 @@ func TestUnreservingNonexistentStorageReservation(t *testing.T) {
 func TestFreeingStorage(t *testing.T) {
 	capacity := 100
 	warehouseStorage := NewWarehouseStorage(capacity)
-	file := File{
-		ID:   dm.IDFactory{}.NewFileID(),
-		Size: 10,
-	}
+	file := NewFile(10)
 	warehouseStorage.Reserve(file)
 	warehouseStorage.Commit(file.ID)
 	warehouseStorage.clearEvents()
