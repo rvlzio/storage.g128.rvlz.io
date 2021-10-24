@@ -68,6 +68,10 @@ type WarehouseStorage struct {
 	events           []dm.Event
 }
 
+func (ws *WarehouseStorage) WarehouseID() dm.WarehouseID {
+	return ws.warehouseID
+}
+
 func (ws *WarehouseStorage) AvailableStorage() int {
 	return ws.unclaimedStorage - ws.queue.Size()
 }
