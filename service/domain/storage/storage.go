@@ -83,7 +83,7 @@ func (ws *WarehouseStorage) ReservedStorage() int {
 func (ws *WarehouseStorage) Reserve(file File) error {
 	if ws.queue.IsWaiting(file) {
 		ws.events = append(ws.events, ev.StorageReservationDuplicated{
-			WarehouseID: ws.warehouseID,
+			WarehouseID: ws.WarehouseID(),
 			FileID:      file.ID,
 		})
 		return er.StorageReservationDuplicated
@@ -91,7 +91,7 @@ func (ws *WarehouseStorage) Reserve(file File) error {
 	availableStorage := ws.AvailableStorage()
 	if file.Size > availableStorage {
 		ws.events = append(ws.events, ev.AvailableStorageExceeded{
-			WarehouseID:      ws.warehouseID,
+			WarehouseID:      ws.WarehouseID(),
 			FileID:           file.ID,
 			AvailableStorage: availableStorage,
 		})
@@ -99,7 +99,7 @@ func (ws *WarehouseStorage) Reserve(file File) error {
 	}
 	ws.queue.Add(file)
 	ws.events = append(ws.events, ev.StorageReserved{
-		WarehouseID: ws.warehouseID,
+		WarehouseID: ws.WarehouseID(),
 		FileID:      file.ID,
 	})
 	return nil
@@ -108,14 +108,14 @@ func (ws *WarehouseStorage) Reserve(file File) error {
 func (ws *WarehouseStorage) Unreserve(fileID dm.FileID) error {
 	if !ws.queue.IsWaiting(File{fileID, 0}) {
 		ws.events = append(ws.events, ev.NonexistentStorageReservationUnreserved{
-			WarehouseID: ws.warehouseID,
+			WarehouseID: ws.WarehouseID(),
 			FileID:      fileID,
 		})
 		return er.NonexistentStorageReservationUnreserved
 	}
 	file, _ := ws.queue.Remove(fileID)
 	ws.events = append(ws.events, ev.StorageUnreserved{
-		WarehouseID:       ws.warehouseID,
+		WarehouseID:       ws.WarehouseID(),
 		FileID:            file.ID,
 		UnreservedStorage: file.Size,
 	})
@@ -125,7 +125,7 @@ func (ws *WarehouseStorage) Unreserve(fileID dm.FileID) error {
 func (ws *WarehouseStorage) Commit(fileID dm.FileID) error {
 	if !ws.queue.IsWaiting(File{fileID, 0}) {
 		ws.events = append(ws.events, ev.UnreservedStorageCommitted{
-			WarehouseID: ws.warehouseID,
+			WarehouseID: ws.WarehouseID(),
 			FileID:      fileID,
 		})
 		return er.UnreservedStorageCommitted
@@ -133,7 +133,7 @@ func (ws *WarehouseStorage) Commit(fileID dm.FileID) error {
 	file, _ := ws.queue.Remove(fileID)
 	ws.unclaimedStorage -= file.Size
 	ws.events = append(ws.events, ev.ReservedStorageCommitted{
-		WarehouseID: ws.warehouseID,
+		WarehouseID: ws.WarehouseID(),
 		FileID:      fileID,
 	})
 	return nil
@@ -157,7 +157,7 @@ func (ws *WarehouseStorage) Free(file File) error {
 	}
 	ws.unclaimedStorage += file.Size
 	ws.events = append(ws.events, ev.StorageFreed{
-		WarehouseID:  ws.warehouseID,
+		WarehouseID:  ws.WarehouseID(),
 		FileID:       file.ID,
 		FreedStorage: file.Size,
 	})
