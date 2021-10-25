@@ -61,12 +61,12 @@ type File struct {
 }
 
 type WarehouseStorage struct {
-	id               dm.WarehouseStorageID
-	warehouseID      dm.WarehouseID
-	capacity         int
-	unclaimedStorage int
-	queue            Queue
-	events           []dm.Event
+	id             dm.WarehouseStorageID
+	warehouseID    dm.WarehouseID
+	capacity       int
+	claimedStorage int
+	queue          Queue
+	events         []dm.Event
 }
 
 func (ws *WarehouseStorage) WarehouseID() dm.WarehouseID {
@@ -78,7 +78,7 @@ func (ws *WarehouseStorage) Capacity() int {
 }
 
 func (ws *WarehouseStorage) AvailableStorage() int {
-	return ws.unclaimedStorage - ws.queue.Size()
+	return ws.capacity - ws.claimedStorage - ws.queue.Size()
 }
 
 func (ws *WarehouseStorage) ReservedStorage() int {
@@ -86,7 +86,7 @@ func (ws *WarehouseStorage) ReservedStorage() int {
 }
 
 func (ws *WarehouseStorage) ClaimedStorage() int {
-	return ws.Capacity() - ws.AvailableStorage()
+	return ws.claimedStorage
 }
 
 func (ws *WarehouseStorage) Reserve(file File) error {
@@ -140,7 +140,7 @@ func (ws *WarehouseStorage) Commit(fileID dm.FileID) error {
 		return er.UnreservedStorageCommitted
 	}
 	file, _ := ws.queue.Remove(fileID)
-	ws.unclaimedStorage -= file.Size
+	ws.claimedStorage += file.Size
 	ws.events = append(ws.events, ev.ReservedStorageCommitted{
 		WarehouseID: ws.WarehouseID(),
 		FileID:      fileID,
@@ -164,7 +164,7 @@ func (ws *WarehouseStorage) Free(file File) error {
 		})
 		return er.FreedStorageExceededClaimedStorage
 	}
-	ws.unclaimedStorage += file.Size
+	ws.claimedStorage -= file.Size
 	ws.events = append(ws.events, ev.StorageFreed{
 		WarehouseID:  ws.WarehouseID(),
 		FileID:       file.ID,
@@ -195,10 +195,10 @@ func (factory StorageFactory) NewWarehouseStorage(
 	warehouseStorageID := dm.IDFactory{}.NewWarehouseStorageID()
 	queue := Queue{reservations: []Reservation{}}
 	return WarehouseStorage{
-		id:               warehouseStorageID,
-		warehouseID:      warehouseID,
-		capacity:         capacity,
-		unclaimedStorage: capacity,
-		queue:            queue,
+		id:             warehouseStorageID,
+		warehouseID:    warehouseID,
+		capacity:       capacity,
+		claimedStorage: 0,
+		queue:          queue,
 	}
 }
