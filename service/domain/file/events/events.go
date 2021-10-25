@@ -9,4 +9,10 @@ type FileVerificationRequested struct {
 	FileID      dm.FileID
 }
 
+type FileAccepted struct {
+	WarehouseID dm.WarehouseID
+	FileID      dm.FileID
+}
+
 func (FileVerificationRequested) IsEvent() {}
+func (FileAccepted) IsEvent()              {}

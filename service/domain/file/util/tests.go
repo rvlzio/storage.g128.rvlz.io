@@ -15,3 +15,14 @@ func GetFileVerificationRequestedEvents(events []dm.Event) []ev.FileVerification
 	}
 	return targetEvents
 }
+
+func GetFileAcceptedEvents(events []dm.Event) []ev.FileAccepted {
+	targetEvents := []ev.FileAccepted{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.FileAccepted)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}

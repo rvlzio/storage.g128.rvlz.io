@@ -34,3 +34,25 @@ func TestVerificationRequest(t *testing.T) {
 		},
 	)
 }
+
+func TestFileAcceptance(t *testing.T) {
+	size, format := 10, CSV
+	warehouseFile := NewWarehouseFile(size, format)
+	warehouseFile.RequestVerification()
+	warehouseFile.clearEvents()
+
+	err := warehouseFile.Accept()
+
+	events := ut.GetFileAcceptedEvents(warehouseFile.Events())
+	assert.Nil(t, err)
+	assert.Equal(t, st.Accepted, warehouseFile.Status())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.FileAccepted{
+			WarehouseID: warehouseFile.WarehouseID(),
+			FileID:      warehouseFile.ID(),
+		},
+	)
+}

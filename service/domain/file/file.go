@@ -44,8 +44,21 @@ func (wf *WarehouseFile) RequestVerification() error {
 	return nil
 }
 
+func (wf *WarehouseFile) Accept() error {
+	wf.status = st.Accepted
+	wf.events = append(wf.events, ev.FileAccepted{
+		WarehouseID: wf.WarehouseID(),
+		FileID:      wf.ID(),
+	})
+	return nil
+}
+
 func (wf *WarehouseFile) Events() []dm.Event {
 	return wf.events
+}
+
+func (wf *WarehouseFile) clearEvents() {
+	wf.events = nil
 }
 
 type FileFactory struct{}

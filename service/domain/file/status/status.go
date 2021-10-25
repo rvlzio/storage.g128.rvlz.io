@@ -7,4 +7,5 @@ type Status struct {
 var (
 	Instantiated = Status{"instantiated"}
 	Verifying    = Status{"verifying"}
+	Accepted     = Status{"accepted"}
 )
