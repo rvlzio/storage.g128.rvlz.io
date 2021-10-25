@@ -168,3 +168,16 @@ func GetMaximumStorageContractionNotMetEvents(
 	}
 	return targetEvents
 }
+
+func GetMinimumStorageContractionNotMetEvents(
+	events []dm.Event,
+) []ev.MinimumStorageContractionNotMet {
+	targetEvents := []ev.MinimumStorageContractionNotMet{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.MinimumStorageContractionNotMet)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}

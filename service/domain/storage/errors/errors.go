@@ -29,4 +29,7 @@ var (
 	MaximumStorageContractionNotMet = errors.New(
 		"maximum_storage_contraction_not_met",
 	)
+	MinimumStorageContractionNotMet = errors.New(
+		"minimum_storage_contraction_not_met",
+	)
 )

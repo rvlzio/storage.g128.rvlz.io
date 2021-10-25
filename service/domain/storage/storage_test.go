@@ -377,3 +377,32 @@ func TestMaximumStorageContraction(t *testing.T) {
 		},
 	)
 }
+
+func TestMinimumStorageContraction(t *testing.T) {
+	capacity, invalidCapacity := 100, 20
+	warehouseStorage := NewWarehouseStorage(capacity)
+	file, otherFile := NewFile(10), NewFile(15)
+	warehouseStorage.Reserve(file)
+	warehouseStorage.Reserve(otherFile)
+	warehouseStorage.Commit(otherFile.ID)
+	warehouseStorage.clearEvents()
+
+	err := warehouseStorage.Shrink(invalidCapacity)
+
+	events := ut.GetMinimumStorageContractionNotMetEvents(
+		warehouseStorage.Events(),
+	)
+	assert.Equal(t, er.MinimumStorageContractionNotMet, err)
+	assert.Equal(t, 75, warehouseStorage.AvailableStorage())
+	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 100, warehouseStorage.Capacity())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.MinimumStorageContractionNotMet{
+			WarehouseID: warehouseStorage.WarehouseID(),
+			Capacity:    100,
+		},
+	)
+}
