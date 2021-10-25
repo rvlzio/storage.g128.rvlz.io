@@ -294,3 +294,30 @@ func TestExpandStorage(t *testing.T) {
 		},
 	)
 }
+
+func TestMinimalStorageExpansion(t *testing.T) {
+	capacity, smallerCapacity := 100, 50
+	warehouseStorage := NewWarehouseStorage(capacity)
+	file, otherFile := NewFile(10), NewFile(15)
+	warehouseStorage.Reserve(file)
+	warehouseStorage.Reserve(otherFile)
+	warehouseStorage.Commit(otherFile.ID)
+	warehouseStorage.clearEvents()
+
+	err := warehouseStorage.Expand(smallerCapacity)
+
+	events := ut.GetMinimumStorageExpansionNotMetEvents(warehouseStorage.Events())
+	assert.Equal(t, er.MinimumStorageExpansionNotMet, err)
+	assert.Equal(t, 75, warehouseStorage.AvailableStorage())
+	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 100, warehouseStorage.Capacity())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.MinimumStorageExpansionNotMet{
+			WarehouseID: warehouseStorage.WarehouseID(),
+			Capacity:    100,
+		},
+	)
+}

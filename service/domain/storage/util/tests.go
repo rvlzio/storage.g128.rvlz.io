@@ -131,3 +131,16 @@ func GetStorageExpandedEvents(events []dm.Event) []ev.StorageExpanded {
 	}
 	return targetEvents
 }
+
+func GetMinimumStorageExpansionNotMetEvents(
+	events []dm.Event,
+) []ev.MinimumStorageExpansionNotMet {
+	targetEvents := []ev.MinimumStorageExpansionNotMet{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.MinimumStorageExpansionNotMet)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}

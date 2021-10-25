@@ -23,4 +23,7 @@ var (
 	FreeingUncommittedStorageAttempted = errors.New(
 		"freeing_uncommitted_storage_attempted",
 	)
+	MinimumStorageExpansionNotMet = errors.New(
+		"minimum_storage_expansion_not_met",
+	)
 )

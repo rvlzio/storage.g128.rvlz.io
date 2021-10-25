@@ -174,6 +174,13 @@ func (ws *WarehouseStorage) Free(file File) error {
 }
 
 func (ws *WarehouseStorage) Expand(capacity int) error {
+	if ws.capacity > capacity {
+		ws.events = append(ws.events, ev.MinimumStorageExpansionNotMet{
+			WarehouseID: ws.WarehouseID(),
+			Capacity:    ws.Capacity(),
+		})
+		return er.MinimumStorageExpansionNotMet
+	}
 	ws.capacity = capacity
 	ws.events = append(ws.events, ev.StorageExpanded{
 		WarehouseID:     ws.WarehouseID(),
