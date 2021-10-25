@@ -73,6 +73,11 @@ type StorageShrunk struct {
 	ShrunkStorage int
 }
 
+type MaximumStorageContractionNotMet struct {
+	WarehouseID dm.WarehouseID
+	Capacity    int
+}
+
 func (StorageReserved) IsEvent()                         {}
 func (AvailableStorageExceeded) IsEvent()                {}
 func (StorageReservationDuplicated) IsEvent()            {}
@@ -86,3 +91,4 @@ func (FreeingUncommittedStorageAttempted) IsEvent()      {}
 func (StorageExpanded) IsEvent()                         {}
 func (MinimumStorageExpansionNotMet) IsEvent()           {}
 func (StorageShrunk) IsEvent()                           {}
+func (MaximumStorageContractionNotMet) IsEvent()         {}

@@ -190,6 +190,13 @@ func (ws *WarehouseStorage) Expand(capacity int) error {
 }
 
 func (ws *WarehouseStorage) Shrink(capacity int) error {
+	if ws.capacity < capacity {
+		ws.events = append(ws.events, ev.MaximumStorageContractionNotMet{
+			WarehouseID: ws.WarehouseID(),
+			Capacity:    ws.Capacity(),
+		})
+		return er.MaximumStorageContractionNotMet
+	}
 	ws.capacity = capacity
 	ws.events = append(ws.events, ev.StorageShrunk{
 		WarehouseID:   ws.WarehouseID(),

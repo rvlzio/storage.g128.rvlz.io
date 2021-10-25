@@ -155,3 +155,16 @@ func GetStorageShrunkEvents(events []dm.Event) []ev.StorageShrunk {
 	}
 	return targetEvents
 }
+
+func GetMaximumStorageContractionNotMetEvents(
+	events []dm.Event,
+) []ev.MaximumStorageContractionNotMet {
+	targetEvents := []ev.MaximumStorageContractionNotMet{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.MaximumStorageContractionNotMet)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}
