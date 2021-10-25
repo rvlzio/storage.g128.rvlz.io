@@ -268,3 +268,29 @@ func TestFreeingUncommittedStorage(t *testing.T) {
 		},
 	)
 }
+
+func TestExpandStorage(t *testing.T) {
+	capacity, expandedCapacity := 100, 1000
+	warehouseStorage := NewWarehouseStorage(capacity)
+	file, otherFile := NewFile(10), NewFile(15)
+	warehouseStorage.Reserve(file)
+	warehouseStorage.Reserve(otherFile)
+	warehouseStorage.Commit(otherFile.ID)
+	warehouseStorage.clearEvents()
+
+	err := warehouseStorage.Expand(expandedCapacity)
+
+	events := ut.GetStorageExpandedEvents(warehouseStorage.Events())
+	assert.Nil(t, err)
+	assert.Equal(t, 975, warehouseStorage.AvailableStorage())
+	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.StorageExpanded{
+			WarehouseID:     warehouseStorage.WarehouseID(),
+			ExpandedStorage: 1000,
+		},
+	)
+}

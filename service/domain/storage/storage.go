@@ -174,7 +174,11 @@ func (ws *WarehouseStorage) Free(file File) error {
 }
 
 func (ws *WarehouseStorage) Expand(capacity int) error {
-
+	ws.capacity = capacity
+	ws.events = append(ws.events, ev.StorageExpanded{
+		WarehouseID:     ws.WarehouseID(),
+		ExpandedStorage: capacity,
+	})
 	return nil
 }
 

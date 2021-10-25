@@ -120,3 +120,14 @@ func GetFreeingUncommittedStorageAttemptedEvents(
 	}
 	return targetEvents
 }
+
+func GetStorageExpandedEvents(events []dm.Event) []ev.StorageExpanded {
+	targetEvents := []ev.StorageExpanded{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.StorageExpanded)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}
