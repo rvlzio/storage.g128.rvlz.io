@@ -26,3 +26,16 @@ func GetFileAcceptedEvents(events []dm.Event) []ev.FileAccepted {
 	}
 	return targetEvents
 }
+
+func GetFileAcceptedBeforeVerificationRequestEvents(
+	events []dm.Event,
+) []ev.FileAcceptedBeforeVerificationRequest {
+	targetEvents := []ev.FileAcceptedBeforeVerificationRequest{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.FileAcceptedBeforeVerificationRequest)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}

@@ -3,6 +3,7 @@ package file
 import (
 	"github.com/stretchr/testify/assert"
 	dm "storage.g128.rvlz.io/domain"
+	er "storage.g128.rvlz.io/domain/file/errors"
 	ev "storage.g128.rvlz.io/domain/file/events"
 	st "storage.g128.rvlz.io/domain/file/status"
 	ut "storage.g128.rvlz.io/domain/file/util"
@@ -51,6 +52,26 @@ func TestFileAcceptance(t *testing.T) {
 		t,
 		events,
 		ev.FileAccepted{
+			WarehouseID: warehouseFile.WarehouseID(),
+			FileID:      warehouseFile.ID(),
+		},
+	)
+}
+
+func TestFileAcceptanceBeforeVerificationRequest(t *testing.T) {
+	size, format := 10, CSV
+	warehouseFile := NewWarehouseFile(size, format)
+
+	err := warehouseFile.Accept()
+
+	events := ut.GetFileAcceptedBeforeVerificationRequestEvents(warehouseFile.Events())
+	assert.Equal(t, er.FileAcceptedBeforeVerificationRequest, err)
+	assert.NotEqual(t, st.Accepted, warehouseFile.Status())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.FileAcceptedBeforeVerificationRequest{
 			WarehouseID: warehouseFile.WarehouseID(),
 			FileID:      warehouseFile.ID(),
 		},

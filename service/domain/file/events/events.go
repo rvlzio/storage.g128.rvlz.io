@@ -14,5 +14,11 @@ type FileAccepted struct {
 	FileID      dm.FileID
 }
 
-func (FileVerificationRequested) IsEvent() {}
-func (FileAccepted) IsEvent()              {}
+type FileAcceptedBeforeVerificationRequest struct {
+	WarehouseID dm.WarehouseID
+	FileID      dm.FileID
+}
+
+func (FileVerificationRequested) IsEvent()             {}
+func (FileAccepted) IsEvent()                          {}
+func (FileAcceptedBeforeVerificationRequest) IsEvent() {}
