@@ -34,10 +34,10 @@ func (queue *Queue) Remove(fileID dm.FileID) (File, error) {
 			if ix == 0 {
 				queue.reservations = queue.reservations[1:]
 			} else if n := len(queue.reservations); ix == n-1 {
-				queue.reservations = queue.reservations[:ix-1]
+				queue.reservations = queue.reservations[:ix]
 			} else {
 				queue.reservations = append(
-					queue.reservations[:ix-1],
+					queue.reservations[:ix],
 					queue.reservations[ix+1:]...,
 				)
 			}
@@ -170,6 +170,11 @@ func (ws *WarehouseStorage) Free(file File) error {
 		FileID:       file.ID,
 		FreedStorage: file.Size,
 	})
+	return nil
+}
+
+func (ws *WarehouseStorage) Expand(capacity int) error {
+
 	return nil
 }
 
