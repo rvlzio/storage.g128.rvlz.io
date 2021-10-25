@@ -144,3 +144,14 @@ func GetMinimumStorageExpansionNotMetEvents(
 	}
 	return targetEvents
 }
+
+func GetStorageShrunkEvents(events []dm.Event) []ev.StorageShrunk {
+	targetEvents := []ev.StorageShrunk{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.StorageShrunk)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}

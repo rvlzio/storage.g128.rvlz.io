@@ -189,6 +189,15 @@ func (ws *WarehouseStorage) Expand(capacity int) error {
 	return nil
 }
 
+func (ws *WarehouseStorage) Shrink(capacity int) error {
+	ws.capacity = capacity
+	ws.events = append(ws.events, ev.StorageShrunk{
+		WarehouseID:   ws.WarehouseID(),
+		ShrunkStorage: capacity,
+	})
+	return nil
+}
+
 func (ws *WarehouseStorage) Events() []dm.Event {
 	return ws.events
 }
