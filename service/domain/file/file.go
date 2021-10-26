@@ -62,6 +62,13 @@ func (wf *WarehouseFile) Accept() error {
 }
 
 func (wf *WarehouseFile) Remove() error {
+	if wf.status == st.Verifying {
+		wf.events = append(wf.events, ev.UnacceptedFileRemovalAttempted{
+			WarehouseID: wf.WarehouseID(),
+			FileID:      wf.ID(),
+		})
+		return er.UnacceptedFileRemovalAttempted
+	}
 	wf.status = st.Removed
 	wf.events = append(wf.events, ev.FileRemoved{
 		WarehouseID: wf.WarehouseID(),

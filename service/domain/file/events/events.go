@@ -24,7 +24,13 @@ type FileRemoved struct {
 	FileID      dm.FileID
 }
 
+type UnacceptedFileRemovalAttempted struct {
+	WarehouseID dm.WarehouseID
+	FileID      dm.FileID
+}
+
 func (FileVerificationRequested) IsEvent()             {}
 func (FileAccepted) IsEvent()                          {}
 func (FileAcceptedBeforeVerificationRequest) IsEvent() {}
 func (FileRemoved) IsEvent()                           {}
+func (UnacceptedFileRemovalAttempted) IsEvent()        {}

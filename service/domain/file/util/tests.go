@@ -50,3 +50,16 @@ func GetFileRemovedEvents(events []dm.Event) []ev.FileRemoved {
 	}
 	return targetEvents
 }
+
+func GetUnacceptedFileRemovalAttemptedEvents(
+	events []dm.Event,
+) []ev.UnacceptedFileRemovalAttempted {
+	targetEvents := []ev.UnacceptedFileRemovalAttempted{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.UnacceptedFileRemovalAttempted)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}
