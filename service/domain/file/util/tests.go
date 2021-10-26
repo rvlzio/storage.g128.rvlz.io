@@ -27,12 +27,12 @@ func GetFileAcceptedEvents(events []dm.Event) []ev.FileAccepted {
 	return targetEvents
 }
 
-func GetFileAcceptedBeforeVerificationRequestEvents(
+func GetInstantiatedFileAcceptanceAttemptedEvents(
 	events []dm.Event,
-) []ev.FileAcceptedBeforeVerificationRequest {
-	targetEvents := []ev.FileAcceptedBeforeVerificationRequest{}
+) []ev.InstantiatedFileAcceptanceAttempted {
+	targetEvents := []ev.InstantiatedFileAcceptanceAttempted{}
 	for _, event := range events {
-		targetEvent, ok := event.(ev.FileAcceptedBeforeVerificationRequest)
+		targetEvent, ok := event.(ev.InstantiatedFileAcceptanceAttempted)
 		if ok {
 			targetEvents = append(targetEvents, targetEvent)
 		}

@@ -47,11 +47,11 @@ func (wf *WarehouseFile) RequestVerification() error {
 
 func (wf *WarehouseFile) Accept() error {
 	if wf.status != st.Verifying {
-		wf.events = append(wf.events, ev.FileAcceptedBeforeVerificationRequest{
+		wf.events = append(wf.events, ev.InstantiatedFileAcceptanceAttempted{
 			WarehouseID: wf.WarehouseID(),
 			FileID:      wf.ID(),
 		})
-		return er.FileAcceptedBeforeVerificationRequest
+		return er.InstantiatedFileAcceptanceAttempted
 	}
 	wf.status = st.Accepted
 	wf.events = append(wf.events, ev.FileAccepted{

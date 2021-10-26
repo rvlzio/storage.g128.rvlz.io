@@ -58,20 +58,20 @@ func TestFileAcceptance(t *testing.T) {
 	)
 }
 
-func TestFileAcceptanceBeforeVerificationRequest(t *testing.T) {
+func TestInstantiatedFileAcceptance(t *testing.T) {
 	size, format := 10, CSV
 	warehouseFile := NewWarehouseFile(size, format)
 
 	err := warehouseFile.Accept()
 
-	events := ut.GetFileAcceptedBeforeVerificationRequestEvents(warehouseFile.Events())
-	assert.Equal(t, er.FileAcceptedBeforeVerificationRequest, err)
+	events := ut.GetInstantiatedFileAcceptanceAttemptedEvents(warehouseFile.Events())
+	assert.Equal(t, er.InstantiatedFileAcceptanceAttempted, err)
 	assert.NotEqual(t, st.Accepted, warehouseFile.Status())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
-		ev.FileAcceptedBeforeVerificationRequest{
+		ev.InstantiatedFileAcceptanceAttempted{
 			WarehouseID: warehouseFile.WarehouseID(),
 			FileID:      warehouseFile.ID(),
 		},

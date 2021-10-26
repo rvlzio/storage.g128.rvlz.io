@@ -5,8 +5,8 @@ import (
 )
 
 var (
-	FileAcceptedBeforeVerificationRequest = errors.New(
-		"file_accepted_before_verification_request",
+	InstantiatedFileAcceptanceAttempted = errors.New(
+		"instantiated_file_acceptance_attempted",
 	)
 	UnacceptedFileRemovalAttempted = errors.New(
 		"unaccepted_file_removal_attempted",

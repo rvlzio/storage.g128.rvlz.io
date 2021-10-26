@@ -14,7 +14,7 @@ type FileAccepted struct {
 	FileID      dm.FileID
 }
 
-type FileAcceptedBeforeVerificationRequest struct {
+type InstantiatedFileAcceptanceAttempted struct {
 	WarehouseID dm.WarehouseID
 	FileID      dm.FileID
 }
@@ -29,8 +29,8 @@ type UnacceptedFileRemovalAttempted struct {
 	FileID      dm.FileID
 }
 
-func (FileVerificationRequested) IsEvent()             {}
-func (FileAccepted) IsEvent()                          {}
-func (FileAcceptedBeforeVerificationRequest) IsEvent() {}
-func (FileRemoved) IsEvent()                           {}
-func (UnacceptedFileRemovalAttempted) IsEvent()        {}
+func (FileVerificationRequested) IsEvent()           {}
+func (FileAccepted) IsEvent()                        {}
+func (InstantiatedFileAcceptanceAttempted) IsEvent() {}
+func (FileRemoved) IsEvent()                         {}
+func (UnacceptedFileRemovalAttempted) IsEvent()      {}
