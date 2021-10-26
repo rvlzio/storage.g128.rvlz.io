@@ -19,6 +19,12 @@ type FileAcceptedBeforeVerificationRequest struct {
 	FileID      dm.FileID
 }
 
+type FileRemoved struct {
+	WarehouseID dm.WarehouseID
+	FileID      dm.FileID
+}
+
 func (FileVerificationRequested) IsEvent()             {}
 func (FileAccepted) IsEvent()                          {}
 func (FileAcceptedBeforeVerificationRequest) IsEvent() {}
+func (FileRemoved) IsEvent()                           {}

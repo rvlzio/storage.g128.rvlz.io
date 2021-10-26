@@ -61,6 +61,15 @@ func (wf *WarehouseFile) Accept() error {
 	return nil
 }
 
+func (wf *WarehouseFile) Remove() error {
+	wf.status = st.Removed
+	wf.events = append(wf.events, ev.FileRemoved{
+		WarehouseID: wf.WarehouseID(),
+		FileID:      wf.ID(),
+	})
+	return nil
+}
+
 func (wf *WarehouseFile) Events() []dm.Event {
 	return wf.events
 }

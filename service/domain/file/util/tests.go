@@ -39,3 +39,14 @@ func GetFileAcceptedBeforeVerificationRequestEvents(
 	}
 	return targetEvents
 }
+
+func GetFileRemovedEvents(events []dm.Event) []ev.FileRemoved {
+	targetEvents := []ev.FileRemoved{}
+	for _, event := range events {
+		targetEvent, ok := event.(ev.FileRemoved)
+		if ok {
+			targetEvents = append(targetEvents, targetEvent)
+		}
+	}
+	return targetEvents
+}

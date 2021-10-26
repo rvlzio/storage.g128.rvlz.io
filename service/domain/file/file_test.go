@@ -77,3 +77,26 @@ func TestFileAcceptanceBeforeVerificationRequest(t *testing.T) {
 		},
 	)
 }
+
+func TestRemoveFile(t *testing.T) {
+	size, format := 10, CSV
+	warehouseFile := NewWarehouseFile(size, format)
+	warehouseFile.RequestVerification()
+	warehouseFile.Accept()
+	warehouseFile.clearEvents()
+
+	err := warehouseFile.Remove()
+
+	events := ut.GetFileRemovedEvents(warehouseFile.Events())
+	assert.Nil(t, err)
+	assert.Equal(t, st.Removed, warehouseFile.Status())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.FileRemoved{
+			WarehouseID: warehouseFile.WarehouseID(),
+			FileID:      warehouseFile.ID(),
+		},
+	)
+}
