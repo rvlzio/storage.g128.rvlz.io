@@ -122,3 +122,23 @@ func TestUnverifiedFileRemoval(t *testing.T) {
 		},
 	)
 }
+
+func TestInstantiatedFileRemoval(t *testing.T) {
+	size, format := 10, CSV
+	warehouseFile := NewWarehouseFile(size, format)
+
+	err := warehouseFile.Remove()
+
+	events := ut.GetUnacceptedFileRemovalAttemptedEvents(warehouseFile.Events())
+	assert.Equal(t, er.UnacceptedFileRemovalAttempted, err)
+	assert.Equal(t, st.Instantiated, warehouseFile.Status())
+	assert.Len(t, events, 1)
+	assert.Contains(
+		t,
+		events,
+		ev.UnacceptedFileRemovalAttempted{
+			WarehouseID: warehouseFile.WarehouseID(),
+			FileID:      warehouseFile.ID(),
+		},
+	)
+}
