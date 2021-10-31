@@ -4,6 +4,10 @@ import (
 	"github.com/google/uuid"
 )
 
+type Message interface {
+	IsMessage()
+}
+
 type Event interface {
 	IsEvent()
 }

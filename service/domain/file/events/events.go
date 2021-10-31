@@ -29,8 +29,13 @@ type UnacceptedFileRemovalAttempted struct {
 	FileID      dm.FileID
 }
 
-func (FileVerificationRequested) IsEvent()           {}
-func (FileAccepted) IsEvent()                        {}
-func (InstantiatedFileAcceptanceAttempted) IsEvent() {}
-func (FileRemoved) IsEvent()                         {}
-func (UnacceptedFileRemovalAttempted) IsEvent()      {}
+func (FileVerificationRequested) IsEvent()             {}
+func (FileAccepted) IsEvent()                          {}
+func (InstantiatedFileAcceptanceAttempted) IsEvent()   {}
+func (FileRemoved) IsEvent()                           {}
+func (UnacceptedFileRemovalAttempted) IsEvent()        {}
+func (FileVerificationRequested) IsMessage()           {}
+func (FileAccepted) IsMessage()                        {}
+func (InstantiatedFileAcceptanceAttempted) IsMessage() {}
+func (FileRemoved) IsMessage()                         {}
+func (UnacceptedFileRemovalAttempted) IsMessage()      {}
