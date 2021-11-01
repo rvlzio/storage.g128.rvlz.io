@@ -12,5 +12,15 @@ services:
     volumes:
     - storage-service-data:/var/lib/postgresql/data
 
+  management-tool:
+    build:
+      context: ./management-tool
+      dockerfile: Dockerfile
+    environment:
+      STORAGE_SERVICE_DATABASE_DOMAIN: ${STORAGE_SERVICE_DATABASE_DOMAIN}
+      STORAGE_SERVICE_DATABASE_USER: ${ADMIN_USER}
+      STORAGE_SERVICE_DATABASE_PASSWORD: ${ADMIN_PASSWORD}
+      STORAGE_SERVICE_ADMIN_DATABASE: ${STORAGE_SERVICE_ADMIN_DATABASE}
+
 volumes:
   storage-service-data:
