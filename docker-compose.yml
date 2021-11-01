@@ -1,0 +1,16 @@
+version: "3.8"
+
+services:
+  storage-service-db:
+    build:
+      context: ./service/infrastructure/database
+      dockerfile: Dockerfile.dev
+    environment:
+      POSTGRES_USER: ${ADMIN_USER}
+      POSTGRES_PASSWORD: ${ADMIN_PASSWORD}
+      POSTGRES_DB: ${STORAGE_SERVICE_ADMIN_DATABASE}
+    volumes:
+    - storage-service-data:/var/lib/postgresql/data
+
+volumes:
+  storage-service-data:
