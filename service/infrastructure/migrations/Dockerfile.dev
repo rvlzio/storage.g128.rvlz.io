@@ -1,0 +1,4 @@
+FROM golang:1.16.3-buster
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+WORKDIR /go/src
+COPY . .

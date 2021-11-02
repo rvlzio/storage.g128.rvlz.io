@@ -12,6 +12,15 @@ services:
     volumes:
     - storage-service-data:/var/lib/postgresql/data
 
+  migrations:
+    build:
+      context: ./service/infrastructure/migrations
+      dockerfile: Dockerfile.dev
+    environment:
+      DATABASE_URI: ${STORAGE_SERVICE_MIGRATIONS_DATABASE}
+    volumes:
+    - ./service/infrastructure/migrations:/go/src
+
   management-tool:
     build:
       context: ./management-tool
