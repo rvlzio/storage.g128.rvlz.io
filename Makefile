@@ -7,6 +7,12 @@ create-database:
 drop-database:
 	docker compose run --rm --no-deps management-tool python manager.py drop-database ${name}
 
+create-database-user:
+	docker compose run --rm --no-deps management-tool python manager.py create-database-user ${database} ${username}
+
+drop-database-user:
+	docker compose run --rm --no-deps management-tool python manager.py drop-database-user ${database} ${username}
+
 create-migration:
 	docker compose run --rm --no-deps migrations migrate create -ext sql -dir versions -seq ${name}
 
