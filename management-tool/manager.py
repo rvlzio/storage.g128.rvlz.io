@@ -20,5 +20,13 @@ def drop_database_handler(database_name):
     database.drop_database(database_name)
 
 
+@cli.command("create-database-user")
+@click.argument("database_name")
+@click.argument("username")
+@click.password_option()
+def create_database_user(database_name, username, password):
+    database.create_user(username, password, database_name=database_name)
+
+
 if __name__ == "__main__":
     cli()

@@ -10,7 +10,7 @@ def connection(func):
         domain = os.environ["STORAGE_SERVICE_DATABASE_DOMAIN"]
         user = os.environ["STORAGE_SERVICE_DATABASE_USER"]
         password = os.environ["STORAGE_SERVICE_DATABASE_PASSWORD"]
-        database_name = kwargs.get(
+        database_name = kwargs.pop(
             'database_name',
             os.environ["STORAGE_SERVICE_ADMIN_DATABASE"],
         )

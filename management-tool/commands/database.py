@@ -20,3 +20,11 @@ def drop_database(conn, database_name):
     cur = conn.cursor()
     cur.execute(f"DROP DATABASE {database_name};")
     click.echo(f"database \"{database_name}\" dropped")
+
+
+@connection
+def create_user(conn, username, password):
+    cur = conn.cursor()
+    cur.execute(f"CREATE ROLE {username} WITH PASSWORD '{password}';")
+    conn.commit()
+    click.echo(f"user/role \"{username}\" created")
