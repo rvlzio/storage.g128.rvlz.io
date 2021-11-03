@@ -28,3 +28,11 @@ def create_user(conn, username, password):
     cur.execute(f"CREATE ROLE {username} WITH PASSWORD '{password}';")
     conn.commit()
     click.echo(f"user/role \"{username}\" created")
+
+
+@connection
+def drop_user(conn, username):
+    cur = conn.cursor()
+    cur.execute(f"DROP ROLE {username};")
+    conn.commit()
+    click.echo(f"user/role \"{username}\" dropped")

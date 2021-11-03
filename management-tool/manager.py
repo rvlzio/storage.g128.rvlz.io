@@ -28,5 +28,12 @@ def create_database_user(database_name, username, password):
     database.create_user(username, password, database_name=database_name)
 
 
+@cli.command("drop-database-user")
+@click.argument("database_name")
+@click.argument("username")
+def drop_database_user(database_name, username):
+    database.drop_user(username, database_name=database_name)
+
+
 if __name__ == "__main__":
     cli()
