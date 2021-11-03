@@ -36,3 +36,11 @@ def drop_user(conn, username):
     cur.execute(f"DROP ROLE {username};")
     conn.commit()
     click.echo(f"user/role \"{username}\" dropped")
+
+
+@connection
+def list_databases(conn):
+    cur = conn.cursor()
+    cur.execute("SELECT datname FROM pg_database WHERE datistemplate = false;")
+    databases = "\n".join([row[0] for row in cur.fetchall()])
+    click.echo(databases)

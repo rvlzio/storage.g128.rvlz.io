@@ -35,5 +35,10 @@ def drop_database_user(database_name, username):
     database.drop_user(username, database_name=database_name)
 
 
+@cli.command("list-databases")
+def list_databases():
+    database.list_databases()
+
+
 if __name__ == "__main__":
     cli()
