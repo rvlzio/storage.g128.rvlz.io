@@ -1,6 +1,9 @@
 build:
 	docker compose build
 
+up:
+	docker compose up -d
+
 create-database:
 	docker compose run --rm --no-deps management-tool python manager.py create-database ${name}
 
