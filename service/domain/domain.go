@@ -53,3 +53,15 @@ func (factory IDFactory) NewFileID() FileID {
 func (factory IDFactory) NewWarehouseStorageID() WarehouseStorageID {
 	return WarehouseStorageID{id: uuid.NewString()}
 }
+
+func (factory IDFactory) NewWarehouseIDFromStr(id string) WarehouseID {
+	return WarehouseID{id: id}
+}
+
+func (factory IDFactory) NewFileIDFromStr(id string) FileID {
+	return FileID{id: id}
+}
+
+func (factory IDFactory) NewWarehouseStorageIDFromStr(id string) WarehouseStorageID {
+	return WarehouseStorageID{id: id}
+}
