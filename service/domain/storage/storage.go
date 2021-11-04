@@ -236,3 +236,48 @@ func (factory StorageFactory) NewWarehouseStorage(
 		queue:          queue,
 	}
 }
+
+type StorageBuilder struct{}
+
+func (StorageBuilder) NewWarehouseStorageBuilder() WarehouseStorageBuilder {
+	queue := Queue{reservations: []Reservation{}}
+	warehouseStorage := WarehouseStorage{
+		queue: queue,
+	}
+	return WarehouseStorageBuilder{warehouseStorage: &warehouseStorage}
+}
+
+type WarehouseStorageBuilder struct {
+	warehouseStorage *WarehouseStorage
+}
+
+func (wsb WarehouseStorageBuilder) GetWarehouseStorage() *WarehouseStorage {
+	return wsb.warehouseStorage
+}
+
+func (wsb WarehouseStorageBuilder) SetID(id string) WarehouseStorageBuilder {
+	wsb.warehouseStorage.id = dm.IDFactory{}.NewWarehouseStorageIDFromStr(id)
+	return wsb
+}
+
+func (wsb WarehouseStorageBuilder) SetWarehouseID(id string) WarehouseStorageBuilder {
+	wsb.warehouseStorage.warehouseID = dm.IDFactory{}.NewWarehouseIDFromStr(id)
+	return wsb
+}
+
+func (wsb WarehouseStorageBuilder) SetCapacity(capacity int) WarehouseStorageBuilder {
+	wsb.warehouseStorage.capacity = capacity
+	return wsb
+}
+
+func (wsb WarehouseStorageBuilder) SetClaimedStorage(claimedStorage int) WarehouseStorageBuilder {
+	wsb.warehouseStorage.claimedStorage = claimedStorage
+	return wsb
+}
+
+func (wsb WarehouseStorageBuilder) AddFileReservation(id string, size int) WarehouseStorageBuilder {
+	fileID := dm.IDFactory{}.NewFileIDFromStr(id)
+	file := File{ID: fileID, Size: size}
+	wsb.warehouseStorage.queue.Add(file)
+	return wsb
+}
