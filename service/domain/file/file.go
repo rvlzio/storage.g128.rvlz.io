@@ -92,7 +92,7 @@ func (FileConstructor) NewWarehouseFile(
 	size int,
 	format Format,
 ) WarehouseFile {
-	fileID := dm.IDFactory{}.NewFileID()
+	fileID := dm.IDConstructor{}.NewFileID()
 	return WarehouseFile{
 		id:          fileID,
 		warehouseID: warehouseID,

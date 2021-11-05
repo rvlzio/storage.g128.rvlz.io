@@ -40,28 +40,28 @@ func (wf WarehouseStorageID) Str() string {
 	return wf.id
 }
 
-type IDFactory struct{}
+type IDConstructor struct{}
 
-func (factory IDFactory) NewWarehouseID() WarehouseID {
+func (IDConstructor) NewWarehouseID() WarehouseID {
 	return WarehouseID{id: uuid.NewString()}
 }
 
-func (factory IDFactory) NewFileID() FileID {
+func (IDConstructor) NewFileID() FileID {
 	return FileID{id: uuid.NewString()}
 }
 
-func (factory IDFactory) NewWarehouseStorageID() WarehouseStorageID {
+func (IDConstructor) NewWarehouseStorageID() WarehouseStorageID {
 	return WarehouseStorageID{id: uuid.NewString()}
 }
 
-func (factory IDFactory) NewWarehouseIDFromStr(id string) WarehouseID {
+func (IDConstructor) NewWarehouseIDFromStr(id string) WarehouseID {
 	return WarehouseID{id: id}
 }
 
-func (factory IDFactory) NewFileIDFromStr(id string) FileID {
+func (IDConstructor) NewFileIDFromStr(id string) FileID {
 	return FileID{id: id}
 }
 
-func (factory IDFactory) NewWarehouseStorageIDFromStr(id string) WarehouseStorageID {
+func (IDConstructor) NewWarehouseStorageIDFromStr(id string) WarehouseStorageID {
 	return WarehouseStorageID{id: id}
 }

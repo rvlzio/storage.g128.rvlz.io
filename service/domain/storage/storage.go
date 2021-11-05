@@ -226,7 +226,7 @@ func (StorageConstructor) NewWarehouseStorage(
 	warehouseID dm.WarehouseID,
 	capacity int,
 ) WarehouseStorage {
-	warehouseStorageID := dm.IDFactory{}.NewWarehouseStorageID()
+	warehouseStorageID := dm.IDConstructor{}.NewWarehouseStorageID()
 	queue := Queue{reservations: []Reservation{}}
 	return WarehouseStorage{
 		id:             warehouseStorageID,
@@ -256,12 +256,12 @@ func (wsb WarehouseStorageBuilder) GetWarehouseStorage() *WarehouseStorage {
 }
 
 func (wsb WarehouseStorageBuilder) SetID(id string) WarehouseStorageBuilder {
-	wsb.warehouseStorage.id = dm.IDFactory{}.NewWarehouseStorageIDFromStr(id)
+	wsb.warehouseStorage.id = dm.IDConstructor{}.NewWarehouseStorageIDFromStr(id)
 	return wsb
 }
 
 func (wsb WarehouseStorageBuilder) SetWarehouseID(id string) WarehouseStorageBuilder {
-	wsb.warehouseStorage.warehouseID = dm.IDFactory{}.NewWarehouseIDFromStr(id)
+	wsb.warehouseStorage.warehouseID = dm.IDConstructor{}.NewWarehouseIDFromStr(id)
 	return wsb
 }
 
@@ -276,7 +276,7 @@ func (wsb WarehouseStorageBuilder) SetClaimedStorage(claimedStorage int) Warehou
 }
 
 func (wsb WarehouseStorageBuilder) AddFileReservation(id string, size int) WarehouseStorageBuilder {
-	fileID := dm.IDFactory{}.NewFileIDFromStr(id)
+	fileID := dm.IDConstructor{}.NewFileIDFromStr(id)
 	file := File{ID: fileID, Size: size}
 	wsb.warehouseStorage.queue.Add(file)
 	return wsb

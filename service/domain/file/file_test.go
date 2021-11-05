@@ -11,7 +11,7 @@ import (
 )
 
 func NewWarehouseFile(size int, format Format) WarehouseFile {
-	warehouseID := dm.IDFactory{}.NewWarehouseID()
+	warehouseID := dm.IDConstructor{}.NewWarehouseID()
 	constructor := FileConstructor{}
 	return constructor.NewWarehouseFile(warehouseID, size, format)
 }

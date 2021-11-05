@@ -10,7 +10,7 @@ import (
 )
 
 func NewWarehouseStorage(capacity int) WarehouseStorage {
-	warehouseID := dm.IDFactory{}.NewWarehouseID()
+	warehouseID := dm.IDConstructor{}.NewWarehouseID()
 	constructor := StorageConstructor{}
 	warehouseStorage := constructor.NewWarehouseStorage(warehouseID, capacity)
 	return warehouseStorage
@@ -18,7 +18,7 @@ func NewWarehouseStorage(capacity int) WarehouseStorage {
 
 func NewFile(size int) File {
 	return File{
-		ID:   dm.IDFactory{}.NewFileID(),
+		ID:   dm.IDConstructor{}.NewFileID(),
 		Size: size,
 	}
 }
@@ -123,7 +123,7 @@ func TestCommittingReservation(t *testing.T) {
 func TestCommittingUnreservedStorage(t *testing.T) {
 	capacity := 100
 	warehouseStorage := NewWarehouseStorage(capacity)
-	fileID := dm.IDFactory{}.NewFileID()
+	fileID := dm.IDConstructor{}.NewFileID()
 
 	err := warehouseStorage.Commit(fileID)
 
@@ -170,7 +170,7 @@ func TestUnreservedStorage(t *testing.T) {
 func TestUnreservingNonexistentStorageReservation(t *testing.T) {
 	capacity := 100
 	warehouseStorage := NewWarehouseStorage(capacity)
-	fileID := dm.IDFactory{}.NewFileID()
+	fileID := dm.IDConstructor{}.NewFileID()
 
 	err := warehouseStorage.Unreserve(fileID)
 
