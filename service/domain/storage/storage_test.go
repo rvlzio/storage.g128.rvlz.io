@@ -11,8 +11,8 @@ import (
 
 func NewWarehouseStorage(capacity int) WarehouseStorage {
 	warehouseID := dm.IDFactory{}.NewWarehouseID()
-	factory := StorageFactory{}
-	warehouseStorage := factory.NewWarehouseStorage(warehouseID, capacity)
+	constructor := StorageConstructor{}
+	warehouseStorage := constructor.NewWarehouseStorage(warehouseID, capacity)
 	return warehouseStorage
 }
 

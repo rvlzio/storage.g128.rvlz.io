@@ -220,9 +220,9 @@ func (ws *WarehouseStorage) clearEvents() {
 	ws.events = nil
 }
 
-type StorageFactory struct{}
+type StorageConstructor struct{}
 
-func (factory StorageFactory) NewWarehouseStorage(
+func (StorageConstructor) NewWarehouseStorage(
 	warehouseID dm.WarehouseID,
 	capacity int,
 ) WarehouseStorage {
