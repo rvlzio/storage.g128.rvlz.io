@@ -85,9 +85,9 @@ func (wf *WarehouseFile) clearEvents() {
 	wf.events = nil
 }
 
-type FileFactory struct{}
+type FileConstructor struct{}
 
-func (factory FileFactory) NewWarehouseFile(
+func (FileConstructor) NewWarehouseFile(
 	warehouseID dm.WarehouseID,
 	size int,
 	format Format,

@@ -12,8 +12,8 @@ import (
 
 func NewWarehouseFile(size int, format Format) WarehouseFile {
 	warehouseID := dm.IDFactory{}.NewWarehouseID()
-	factory := FileFactory{}
-	return factory.NewWarehouseFile(warehouseID, size, format)
+	constructor := FileConstructor{}
+	return constructor.NewWarehouseFile(warehouseID, size, format)
 }
 
 func TestVerificationRequest(t *testing.T) {
