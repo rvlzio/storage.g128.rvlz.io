@@ -281,3 +281,44 @@ func (wsb WarehouseStorageBuilder) AddFileReservation(id string, size int) Wareh
 	wsb.warehouseStorage.queue.Add(file)
 	return wsb
 }
+
+type WarehouseStorageProxy struct {
+	warehouseStorage *WarehouseStorage
+}
+
+func (wsp *WarehouseStorageProxy) GetID() string {
+	return wsp.warehouseStorage.id.Str()
+}
+
+func (wsp *WarehouseStorageProxy) GetWarehouseID() string {
+	return wsp.warehouseStorage.warehouseID.Str()
+}
+
+func (wsp *WarehouseStorageProxy) GetCapacity() int {
+	return wsp.warehouseStorage.capacity
+}
+
+func (wsp *WarehouseStorageProxy) GetClaimedStorage() int {
+	return wsp.warehouseStorage.claimedStorage
+}
+
+func (wsp *WarehouseStorageProxy) GetFileReservations() []FileReservation {
+	var files []FileReservation
+	for _, reservation := range wsp.warehouseStorage.queue.reservations {
+		fileReservation := FileReservation{
+			ID:   reservation.File.ID.Str(),
+			Size: reservation.File.Size,
+		}
+		files = append(files, fileReservation)
+	}
+	return files
+}
+
+type FileReservation struct {
+	ID   string
+	Size int
+}
+
+func NewWarehouseStorageProxy(warehouseStorage *WarehouseStorage) WarehouseStorageProxy {
+	return WarehouseStorageProxy{warehouseStorage}
+}
