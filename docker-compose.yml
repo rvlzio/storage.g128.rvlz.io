@@ -1,6 +1,19 @@
 version: "3.8"
 
 services:
+  storage-service-api:
+    build:
+      context: ./service
+      dockerfile: Dockerfile.dev
+    environment:
+      DATABASE_USER: ${STORAGE_SERVICE_API_DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${STORAGE_SERVICE_API_DATABASE_PASSWORD}
+      DATABASE_DOMAIN: ${STORAGE_SERVICE_DATABASE_DOMAIN}
+      DATABASE_NAME: ${STORAGE_SERVICE_DEV_DATABASE}
+    volumes:
+      - ./service:/go/src
+      - .pkg:/go/pkg
+
   storage-service-db:
     build:
       context: ./service/infrastructure/database
