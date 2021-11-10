@@ -18,127 +18,127 @@ func NewWarehouseFile(size int, format Format) WarehouseFile {
 
 func TestVerificationRequest(t *testing.T) {
 	size, format := 10, CSV
-	warehouseFile := NewWarehouseFile(size, format)
+	sut := NewWarehouseFile(size, format)
 
-	err := warehouseFile.RequestVerification()
+	err := sut.RequestVerification()
 
-	events := ut.GetFileVerificationRequestedEvents(warehouseFile.Events())
+	events := ut.GetFileVerificationRequestedEvents(sut.Events())
 	assert.Nil(t, err)
-	assert.Equal(t, st.Verifying, warehouseFile.Status())
+	assert.Equal(t, st.Verifying, sut.Status())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.FileVerificationRequested{
-			WarehouseID: warehouseFile.WarehouseID(),
-			FileID:      warehouseFile.ID(),
+			WarehouseID: sut.WarehouseID(),
+			FileID:      sut.ID(),
 		},
 	)
 }
 
 func TestFileAcceptance(t *testing.T) {
 	size, format := 10, CSV
-	warehouseFile := NewWarehouseFile(size, format)
-	warehouseFile.RequestVerification()
-	warehouseFile.clearEvents()
+	sut := NewWarehouseFile(size, format)
+	sut.RequestVerification()
+	sut.clearEvents()
 
-	err := warehouseFile.Accept()
+	err := sut.Accept()
 
-	events := ut.GetFileAcceptedEvents(warehouseFile.Events())
+	events := ut.GetFileAcceptedEvents(sut.Events())
 	assert.Nil(t, err)
-	assert.Equal(t, st.Accepted, warehouseFile.Status())
+	assert.Equal(t, st.Accepted, sut.Status())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.FileAccepted{
-			WarehouseID: warehouseFile.WarehouseID(),
-			FileID:      warehouseFile.ID(),
+			WarehouseID: sut.WarehouseID(),
+			FileID:      sut.ID(),
 		},
 	)
 }
 
 func TestInstantiatedFileAcceptance(t *testing.T) {
 	size, format := 10, CSV
-	warehouseFile := NewWarehouseFile(size, format)
+	sut := NewWarehouseFile(size, format)
 
-	err := warehouseFile.Accept()
+	err := sut.Accept()
 
-	events := ut.GetInstantiatedFileAcceptanceAttemptedEvents(warehouseFile.Events())
+	events := ut.GetInstantiatedFileAcceptanceAttemptedEvents(sut.Events())
 	assert.Equal(t, er.InstantiatedFileAcceptanceAttempted, err)
-	assert.NotEqual(t, st.Accepted, warehouseFile.Status())
+	assert.NotEqual(t, st.Accepted, sut.Status())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.InstantiatedFileAcceptanceAttempted{
-			WarehouseID: warehouseFile.WarehouseID(),
-			FileID:      warehouseFile.ID(),
+			WarehouseID: sut.WarehouseID(),
+			FileID:      sut.ID(),
 		},
 	)
 }
 
 func TestRemoveFile(t *testing.T) {
 	size, format := 10, CSV
-	warehouseFile := NewWarehouseFile(size, format)
-	warehouseFile.RequestVerification()
-	warehouseFile.Accept()
-	warehouseFile.clearEvents()
+	sut := NewWarehouseFile(size, format)
+	sut.RequestVerification()
+	sut.Accept()
+	sut.clearEvents()
 
-	err := warehouseFile.Remove()
+	err := sut.Remove()
 
-	events := ut.GetFileRemovedEvents(warehouseFile.Events())
+	events := ut.GetFileRemovedEvents(sut.Events())
 	assert.Nil(t, err)
-	assert.Equal(t, st.Removed, warehouseFile.Status())
+	assert.Equal(t, st.Removed, sut.Status())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.FileRemoved{
-			WarehouseID: warehouseFile.WarehouseID(),
-			FileID:      warehouseFile.ID(),
+			WarehouseID: sut.WarehouseID(),
+			FileID:      sut.ID(),
 		},
 	)
 }
 
 func TestUnverifiedFileRemoval(t *testing.T) {
 	size, format := 10, CSV
-	warehouseFile := NewWarehouseFile(size, format)
-	warehouseFile.RequestVerification()
-	warehouseFile.clearEvents()
+	sut := NewWarehouseFile(size, format)
+	sut.RequestVerification()
+	sut.clearEvents()
 
-	err := warehouseFile.Remove()
+	err := sut.Remove()
 
-	events := ut.GetUnacceptedFileRemovalAttemptedEvents(warehouseFile.Events())
+	events := ut.GetUnacceptedFileRemovalAttemptedEvents(sut.Events())
 	assert.Equal(t, er.UnacceptedFileRemovalAttempted, err)
-	assert.Equal(t, st.Verifying, warehouseFile.Status())
+	assert.Equal(t, st.Verifying, sut.Status())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.UnacceptedFileRemovalAttempted{
-			WarehouseID: warehouseFile.WarehouseID(),
-			FileID:      warehouseFile.ID(),
+			WarehouseID: sut.WarehouseID(),
+			FileID:      sut.ID(),
 		},
 	)
 }
 
 func TestInstantiatedFileRemoval(t *testing.T) {
 	size, format := 10, CSV
-	warehouseFile := NewWarehouseFile(size, format)
+	sut := NewWarehouseFile(size, format)
 
-	err := warehouseFile.Remove()
+	err := sut.Remove()
 
-	events := ut.GetUnacceptedFileRemovalAttemptedEvents(warehouseFile.Events())
+	events := ut.GetUnacceptedFileRemovalAttemptedEvents(sut.Events())
 	assert.Equal(t, er.UnacceptedFileRemovalAttempted, err)
-	assert.Equal(t, st.Instantiated, warehouseFile.Status())
+	assert.Equal(t, st.Instantiated, sut.Status())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.UnacceptedFileRemovalAttempted{
-			WarehouseID: warehouseFile.WarehouseID(),
-			FileID:      warehouseFile.ID(),
+			WarehouseID: sut.WarehouseID(),
+			FileID:      sut.ID(),
 		},
 	)
 }
