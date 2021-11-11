@@ -25,21 +25,21 @@ func NewFile(size int) File {
 
 func TestStorageReservation(t *testing.T) {
 	capacity := 100
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file := NewFile(10)
 
-	err := warehouseStorage.Reserve(file)
+	err := sut.Reserve(file)
 
-	events := ut.GetStorageReservedEvents(warehouseStorage.Events())
+	events := ut.GetStorageReservedEvents(sut.Events())
 	assert.Nil(t, err)
-	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 90, sut.AvailableStorage())
+	assert.Equal(t, 10, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.StorageReserved{
-			WarehouseID: warehouseStorage.WarehouseID(),
+			WarehouseID: sut.WarehouseID(),
 			FileID:      file.ID,
 		},
 	)
@@ -47,24 +47,24 @@ func TestStorageReservation(t *testing.T) {
 
 func TestExceedingStorageLimit(t *testing.T) {
 	capacity := 100
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file := NewFile(10)
 	otherFile := NewFile(100)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.clearEvents()
 
-	err := warehouseStorage.Reserve(otherFile)
+	err := sut.Reserve(otherFile)
 
-	events := ut.GetAvailableStorageExceededEvents(warehouseStorage.Events())
+	events := ut.GetAvailableStorageExceededEvents(sut.Events())
 	assert.Equal(t, er.AvailableStorageExceeded, err)
-	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 90, sut.AvailableStorage())
+	assert.Equal(t, 10, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.AvailableStorageExceeded{
-			WarehouseID:      warehouseStorage.WarehouseID(),
+			WarehouseID:      sut.WarehouseID(),
 			FileID:           otherFile.ID,
 			AvailableStorage: 90,
 		},
@@ -73,24 +73,24 @@ func TestExceedingStorageLimit(t *testing.T) {
 
 func TestDuplicateStorageReservations(t *testing.T) {
 	capacity := 100
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file := NewFile(10)
 	sameFile := file
-	warehouseStorage.Reserve(file)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.clearEvents()
 
-	err := warehouseStorage.Reserve(sameFile)
+	err := sut.Reserve(sameFile)
 
-	events := ut.GetStorageReservationDuplicatedEvents(warehouseStorage.Events())
+	events := ut.GetStorageReservationDuplicatedEvents(sut.Events())
 	assert.Equal(t, er.StorageReservationDuplicated, err)
-	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 90, sut.AvailableStorage())
+	assert.Equal(t, 10, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.StorageReservationDuplicated{
-			WarehouseID: warehouseStorage.WarehouseID(),
+			WarehouseID: sut.WarehouseID(),
 			FileID:      file.ID,
 		},
 	)
@@ -98,23 +98,23 @@ func TestDuplicateStorageReservations(t *testing.T) {
 
 func TestCommittingReservation(t *testing.T) {
 	capacity := 100
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file := NewFile(10)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.clearEvents()
 
-	err := warehouseStorage.Commit(file.ID)
+	err := sut.Commit(file.ID)
 
-	events := ut.GetReservedStorageCommittedEvents(warehouseStorage.Events())
+	events := ut.GetReservedStorageCommittedEvents(sut.Events())
 	assert.Nil(t, err)
-	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 90, sut.AvailableStorage())
+	assert.Equal(t, 0, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.ReservedStorageCommitted{
-			WarehouseID: warehouseStorage.WarehouseID(),
+			WarehouseID: sut.WarehouseID(),
 			FileID:      file.ID,
 		},
 	)
@@ -122,21 +122,21 @@ func TestCommittingReservation(t *testing.T) {
 
 func TestCommittingUnreservedStorage(t *testing.T) {
 	capacity := 100
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	fileID := dm.IDConstructor{}.NewFileID()
 
-	err := warehouseStorage.Commit(fileID)
+	err := sut.Commit(fileID)
 
-	events := ut.GetUnreservedStorageCommittedEvents(warehouseStorage.Events())
+	events := ut.GetUnreservedStorageCommittedEvents(sut.Events())
 	assert.Equal(t, er.UnreservedStorageCommitted, err)
-	assert.Equal(t, 100, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 100, sut.AvailableStorage())
+	assert.Equal(t, 0, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.UnreservedStorageCommitted{
-			WarehouseID: warehouseStorage.WarehouseID(),
+			WarehouseID: sut.WarehouseID(),
 			FileID:      fileID,
 		},
 	)
@@ -144,23 +144,23 @@ func TestCommittingUnreservedStorage(t *testing.T) {
 
 func TestUnreservedStorage(t *testing.T) {
 	capacity := 100
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file := NewFile(10)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.clearEvents()
 
-	err := warehouseStorage.Unreserve(file.ID)
+	err := sut.Unreserve(file.ID)
 
-	events := ut.GetStorageUnreservedEvents(warehouseStorage.Events())
+	events := ut.GetStorageUnreservedEvents(sut.Events())
 	assert.Nil(t, err)
-	assert.Equal(t, 100, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 100, sut.AvailableStorage())
+	assert.Equal(t, 0, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.StorageUnreserved{
-			WarehouseID:       warehouseStorage.WarehouseID(),
+			WarehouseID:       sut.WarehouseID(),
 			FileID:            file.ID,
 			UnreservedStorage: file.Size,
 		},
@@ -169,23 +169,23 @@ func TestUnreservedStorage(t *testing.T) {
 
 func TestUnreservingNonexistentStorageReservation(t *testing.T) {
 	capacity := 100
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	fileID := dm.IDConstructor{}.NewFileID()
 
-	err := warehouseStorage.Unreserve(fileID)
+	err := sut.Unreserve(fileID)
 
 	events := ut.GetNonexistentStorageReservationUnreservedEvents(
-		warehouseStorage.Events(),
+		sut.Events(),
 	)
 	assert.Equal(t, er.NonexistentStorageReservationUnreserved, err)
-	assert.Equal(t, 100, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 100, sut.AvailableStorage())
+	assert.Equal(t, 0, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.NonexistentStorageReservationUnreserved{
-			WarehouseID: warehouseStorage.WarehouseID(),
+			WarehouseID: sut.WarehouseID(),
 			FileID:      fileID,
 		},
 	)
@@ -193,24 +193,24 @@ func TestUnreservingNonexistentStorageReservation(t *testing.T) {
 
 func TestFreeingStorage(t *testing.T) {
 	capacity := 100
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file := NewFile(10)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.Commit(file.ID)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.Commit(file.ID)
+	sut.clearEvents()
 
-	err := warehouseStorage.Free(file)
+	err := sut.Free(file)
 
-	events := ut.GetStorageFreedEvents(warehouseStorage.Events())
+	events := ut.GetStorageFreedEvents(sut.Events())
 	assert.Nil(t, err)
-	assert.Equal(t, 100, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 100, sut.AvailableStorage())
+	assert.Equal(t, 0, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.StorageFreed{
-			WarehouseID:  warehouseStorage.WarehouseID(),
+			WarehouseID:  sut.WarehouseID(),
 			FileID:       file.ID,
 			FreedStorage: file.Size,
 		},
@@ -219,24 +219,24 @@ func TestFreeingStorage(t *testing.T) {
 
 func TestFreedStorageExceededClaimedStorage(t *testing.T) {
 	capacity := 100
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file, largeFile := NewFile(10), NewFile(15)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.Commit(file.ID)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.Commit(file.ID)
+	sut.clearEvents()
 
-	err := warehouseStorage.Free(largeFile)
+	err := sut.Free(largeFile)
 
-	events := ut.GetFreedStorageExceededClaimedStorageEvents(warehouseStorage.Events())
+	events := ut.GetFreedStorageExceededClaimedStorageEvents(sut.Events())
 	assert.Equal(t, er.FreedStorageExceededClaimedStorage, err)
-	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 0, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 90, sut.AvailableStorage())
+	assert.Equal(t, 0, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.FreedStorageExceededClaimedStorage{
-			WarehouseID:    warehouseStorage.WarehouseID(),
+			WarehouseID:    sut.WarehouseID(),
 			FileID:         largeFile.ID,
 			ClaimedStorage: 10,
 		},
@@ -245,25 +245,25 @@ func TestFreedStorageExceededClaimedStorage(t *testing.T) {
 
 func TestFreeingUncommittedStorage(t *testing.T) {
 	capacity := 100
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file := NewFile(10)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.clearEvents()
 
-	err := warehouseStorage.Free(file)
+	err := sut.Free(file)
 
 	events := ut.GetFreeingUncommittedStorageAttemptedEvents(
-		warehouseStorage.Events(),
+		sut.Events(),
 	)
 	assert.Equal(t, er.FreeingUncommittedStorageAttempted, err)
-	assert.Equal(t, 90, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 90, sut.AvailableStorage())
+	assert.Equal(t, 10, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.FreeingUncommittedStorageAttempted{
-			WarehouseID: warehouseStorage.WarehouseID(),
+			WarehouseID: sut.WarehouseID(),
 			FileID:      file.ID,
 		},
 	)
@@ -271,25 +271,25 @@ func TestFreeingUncommittedStorage(t *testing.T) {
 
 func TestExpandStorage(t *testing.T) {
 	capacity, expandedCapacity := 100, 1000
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file, otherFile := NewFile(10), NewFile(15)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.Reserve(otherFile)
-	warehouseStorage.Commit(otherFile.ID)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.Reserve(otherFile)
+	sut.Commit(otherFile.ID)
+	sut.clearEvents()
 
-	err := warehouseStorage.Expand(expandedCapacity)
+	err := sut.Expand(expandedCapacity)
 
-	events := ut.GetStorageExpandedEvents(warehouseStorage.Events())
+	events := ut.GetStorageExpandedEvents(sut.Events())
 	assert.Nil(t, err)
-	assert.Equal(t, 975, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
+	assert.Equal(t, 975, sut.AvailableStorage())
+	assert.Equal(t, 10, sut.ReservedStorage())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.StorageExpanded{
-			WarehouseID:     warehouseStorage.WarehouseID(),
+			WarehouseID:     sut.WarehouseID(),
 			ExpandedStorage: 1000,
 		},
 	)
@@ -297,26 +297,26 @@ func TestExpandStorage(t *testing.T) {
 
 func TestMinimalStorageExpansion(t *testing.T) {
 	capacity, smallerCapacity := 100, 50
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file, otherFile := NewFile(10), NewFile(15)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.Reserve(otherFile)
-	warehouseStorage.Commit(otherFile.ID)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.Reserve(otherFile)
+	sut.Commit(otherFile.ID)
+	sut.clearEvents()
 
-	err := warehouseStorage.Expand(smallerCapacity)
+	err := sut.Expand(smallerCapacity)
 
-	events := ut.GetMinimumStorageExpansionNotMetEvents(warehouseStorage.Events())
+	events := ut.GetMinimumStorageExpansionNotMetEvents(sut.Events())
 	assert.Equal(t, er.MinimumStorageExpansionNotMet, err)
-	assert.Equal(t, 75, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
-	assert.Equal(t, 100, warehouseStorage.Capacity())
+	assert.Equal(t, 75, sut.AvailableStorage())
+	assert.Equal(t, 10, sut.ReservedStorage())
+	assert.Equal(t, 100, sut.Capacity())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.MinimumStorageExpansionNotMet{
-			WarehouseID: warehouseStorage.WarehouseID(),
+			WarehouseID: sut.WarehouseID(),
 			Capacity:    100,
 		},
 	)
@@ -324,26 +324,26 @@ func TestMinimalStorageExpansion(t *testing.T) {
 
 func TestShrinkStorage(t *testing.T) {
 	capacity, shrunkCapacity := 100, 50
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file, otherFile := NewFile(10), NewFile(15)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.Reserve(otherFile)
-	warehouseStorage.Commit(otherFile.ID)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.Reserve(otherFile)
+	sut.Commit(otherFile.ID)
+	sut.clearEvents()
 
-	err := warehouseStorage.Shrink(shrunkCapacity)
+	err := sut.Shrink(shrunkCapacity)
 
-	events := ut.GetStorageShrunkEvents(warehouseStorage.Events())
+	events := ut.GetStorageShrunkEvents(sut.Events())
 	assert.Nil(t, err)
-	assert.Equal(t, 25, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
-	assert.Equal(t, 50, warehouseStorage.Capacity())
+	assert.Equal(t, 25, sut.AvailableStorage())
+	assert.Equal(t, 10, sut.ReservedStorage())
+	assert.Equal(t, 50, sut.Capacity())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.StorageShrunk{
-			WarehouseID:   warehouseStorage.WarehouseID(),
+			WarehouseID:   sut.WarehouseID(),
 			ShrunkStorage: 50,
 		},
 	)
@@ -351,28 +351,28 @@ func TestShrinkStorage(t *testing.T) {
 
 func TestMaximumStorageContraction(t *testing.T) {
 	capacity, largerCapacity := 100, 1000
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file, otherFile := NewFile(10), NewFile(15)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.Reserve(otherFile)
-	warehouseStorage.Commit(otherFile.ID)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.Reserve(otherFile)
+	sut.Commit(otherFile.ID)
+	sut.clearEvents()
 
-	err := warehouseStorage.Shrink(largerCapacity)
+	err := sut.Shrink(largerCapacity)
 
 	events := ut.GetMaximumStorageContractionNotMetEvents(
-		warehouseStorage.Events(),
+		sut.Events(),
 	)
 	assert.Equal(t, er.MaximumStorageContractionNotMet, err)
-	assert.Equal(t, 75, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
-	assert.Equal(t, 100, warehouseStorage.Capacity())
+	assert.Equal(t, 75, sut.AvailableStorage())
+	assert.Equal(t, 10, sut.ReservedStorage())
+	assert.Equal(t, 100, sut.Capacity())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.MaximumStorageContractionNotMet{
-			WarehouseID: warehouseStorage.WarehouseID(),
+			WarehouseID: sut.WarehouseID(),
 			Capacity:    100,
 		},
 	)
@@ -380,28 +380,28 @@ func TestMaximumStorageContraction(t *testing.T) {
 
 func TestMinimumStorageContraction(t *testing.T) {
 	capacity, invalidCapacity := 100, 20
-	warehouseStorage := NewWarehouseStorage(capacity)
+	sut := NewWarehouseStorage(capacity)
 	file, otherFile := NewFile(10), NewFile(15)
-	warehouseStorage.Reserve(file)
-	warehouseStorage.Reserve(otherFile)
-	warehouseStorage.Commit(otherFile.ID)
-	warehouseStorage.clearEvents()
+	sut.Reserve(file)
+	sut.Reserve(otherFile)
+	sut.Commit(otherFile.ID)
+	sut.clearEvents()
 
-	err := warehouseStorage.Shrink(invalidCapacity)
+	err := sut.Shrink(invalidCapacity)
 
 	events := ut.GetMinimumStorageContractionNotMetEvents(
-		warehouseStorage.Events(),
+		sut.Events(),
 	)
 	assert.Equal(t, er.MinimumStorageContractionNotMet, err)
-	assert.Equal(t, 75, warehouseStorage.AvailableStorage())
-	assert.Equal(t, 10, warehouseStorage.ReservedStorage())
-	assert.Equal(t, 100, warehouseStorage.Capacity())
+	assert.Equal(t, 75, sut.AvailableStorage())
+	assert.Equal(t, 10, sut.ReservedStorage())
+	assert.Equal(t, 100, sut.Capacity())
 	assert.Len(t, events, 1)
 	assert.Contains(
 		t,
 		events,
 		ev.MinimumStorageContractionNotMet{
-			WarehouseID: warehouseStorage.WarehouseID(),
+			WarehouseID: sut.WarehouseID(),
 			Capacity:    100,
 		},
 	)
